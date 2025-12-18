@@ -23,6 +23,8 @@ interface StudyState {
   logActivity: () => void;
   reorderAreas: (oldIndex: number, newIndex: number) => void;
   reorderTopics: (areaId: string, oldIndex: number, newIndex: number) => void;
+  getStreak: () => number;
+  getRank: () => string;
 }
 
 export const useStudyStore = create<StudyState>()(
@@ -152,11 +154,49 @@ export const useStudyStore = create<StudyState>()(
 
           return { areas: newAreas };
         });
+      },
+
+      getStreak: () => {
+        const logs = get().studyLogs;
+        if (logs.length === 0) return 0;
+
+        const sortedDates = [...new Set(logs.map(l => l.date))].sort((a, b) => new Date(b).getTime() - new Date(a).getTime());
+        const today = new Date().toISOString().split('T')[0];
+        const yesterday = new Date(Date.now() - 86400000).toISOString().split('T')[0];
+
+        // If no study today or yesterday, streak is broken (0), unless it's just today missing (start check from yesterday)
+        if (!sortedDates.includes(today) && !sortedDates.includes(yesterday)) return 0;
+
+        let streak = 0;
+        let currentDate = sortedDates.includes(today) ? new Date(today) : new Date(yesterday);
+
+        // Iterate backwards
+        for (let i = 0; i < sortedDates.length; i++) {
+          const dateStr = currentDate.toISOString().split('T')[0];
+          if (sortedDates.includes(dateStr)) {
+            streak++;
+            currentDate.setDate(currentDate.getDate() - 1);
+          } else {
+            break;
+          }
+        }
+        return streak;
+      },
+
+      getRank: () => {
+        const totalSeconds = get().areas.flatMap(a => a.topics).reduce((acc, t) => acc + (t.timeSpent || 0), 0);
+        const hours = totalSeconds / 3600;
+
+        if (hours < 5) return "Novato";
+        if (hours < 20) return "Aprendiz";
+        if (hours < 50) return "Erudito";
+        if (hours < 100) return "Maestro";
+        return "Gran Maestro";
       }
     }),
     {
       name: 'edustream-storage',
-      partialize: (state) => ({ areas: state.areas, studyLogs: state.studyLogs }), // Solo persistimos datos, no UI state
+      partialize: (state) => ({ areas: state.areas, studyLogs: state.studyLogs }),
     }
   )
 );

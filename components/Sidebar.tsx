@@ -45,7 +45,9 @@ const SortableAreaItem: React.FC<{ area: StudyArea, isActive: boolean, onClick: 
 };
 
 const Sidebar: React.FC<SidebarProps> = ({ onAddArea }) => {
-  const { areas, activeAreaId, setActiveAreaId, isDarkMode, toggleDarkMode, reorderAreas } = useStudyStore();
+  const { areas, activeAreaId, setActiveAreaId, isDarkMode, toggleDarkMode, reorderAreas, getStreak, getRank } = useStudyStore();
+  const streak = getStreak();
+  const rank = getRank();
 
   const sensors = useSensors(
     useSensor(PointerSensor),
@@ -65,24 +67,42 @@ const Sidebar: React.FC<SidebarProps> = ({ onAddArea }) => {
 
   return (
     <aside className="w-72 bg-white dark:bg-[#161B22] border-r border-slate-200 dark:border-[#30363d] h-screen sticky top-0 flex flex-col transition-colors duration-300">
-      <div className="p-6 border-b border-slate-200 dark:border-[#30363d] flex items-center justify-between">
-        <h1 className="text-xl font-bold text-slate-900 dark:text-lime-400 flex items-center gap-2 cursor-pointer" onClick={() => setActiveAreaId(null)}>
-          <svg className="w-8 h-8 text-blue-600 dark:text-lime-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" />
-          </svg>
-          EduFlow
-        </h1>
-        <button
-          onClick={toggleDarkMode}
-          className="p-2 rounded-lg bg-slate-100 dark:bg-[#0F1115] text-slate-500 dark:text-slate-400 hover:ring-2 hover:ring-blue-200 dark:hover:ring-lime-400/50 transition-all"
-          title="Alternar Modo Oscuro"
-        >
-          {isDarkMode ? (
-            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364-6.364l-.707.707M6.343 17.657l-.707.707M16.243 17.657l-.707-.707M6.343 6.364l-.707-.707M15 12a3 3 0 11-6 0 3 3 0 016 0z" /></svg>
-          ) : (
-            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z" /></svg>
-          )}
-        </button>
+      <div className="p-6 border-b border-slate-200 dark:border-[#30363d] flex flex-col gap-4">
+        <div className="flex items-center justify-between">
+          <h1 className="text-xl font-bold text-slate-900 dark:text-lime-400 flex items-center gap-2 cursor-pointer" onClick={() => setActiveAreaId(null)}>
+            <svg className="w-8 h-8 text-blue-600 dark:text-lime-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" />
+            </svg>
+            EduFlow
+          </h1>
+          <button
+            onClick={toggleDarkMode}
+            className="p-2 rounded-lg bg-slate-100 dark:bg-[#0F1115] text-slate-500 dark:text-slate-400 hover:ring-2 hover:ring-blue-200 dark:hover:ring-lime-400/50 transition-all"
+            title="Alternar Modo Oscuro"
+          >
+            {isDarkMode ? (
+              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364-6.364l-.707.707M6.343 17.657l-.707.707M16.243 17.657l-.707-.707M6.343 6.364l-.707-.707M15 12a3 3 0 11-6 0 3 3 0 016 0z" /></svg>
+            ) : (
+              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z" /></svg>
+            )}
+          </button>
+        </div>
+
+        <div className="flex gap-2">
+          <div className="flex-1 bg-slate-50 dark:bg-[#0F1115] p-3 rounded-xl border border-slate-200 dark:border-[#30363d] flex flex-col items-center justify-center group cursor-help transition-all hover:border-orange-400/50" title="Días consecutivos estudiando">
+            <div className="text-orange-500 dark:text-orange-400 font-black text-xl flex items-center gap-1">
+              <span className="animate-pulse">🔥</span> {streak}
+            </div>
+            <div className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Racha</div>
+          </div>
+
+          <div className="flex-1 bg-slate-50 dark:bg-[#0F1115] p-3 rounded-xl border border-slate-200 dark:border-[#30363d] flex flex-col items-center justify-center group cursor-help transition-all hover:border-purple-400/50" title="Tu rango basado en horas de estudio">
+            <div className="text-purple-600 dark:text-purple-400 font-black text-sm flex items-center gap-1 mb-1">
+              {rank}
+            </div>
+            <div className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Rango</div>
+          </div>
+        </div>
       </div>
 
       <nav className="flex-1 overflow-y-auto p-4 space-y-2 custom-scrollbar">

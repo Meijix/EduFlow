@@ -1,0 +1,8 @@
+{
+  "name": "EduStream - Inteligencia de Estudio",
+  "description": "Una plataforma avanzada para organizar áreas de estudio, generar planes de aprendizaje con IA y realizar un seguimiento detallado del progreso utilizando Gemini.",
+  "requestFramePermissions": [
+    "camera",
+    "microphone"
+  ]
+}

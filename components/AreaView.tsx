@@ -6,6 +6,7 @@ import Timer from './Timer';
 import KanbanBoard from './KanbanBoard';
 import QuizModule from './QuizModule';
 import SkillTree from './SkillTree';
+import ResourceModal from './ResourceModal';
 import { useStudyStore } from '../store/useStudyStore';
 import { DndContext, closestCenter, DragEndEvent, KeyboardSensor, PointerSensor, useSensor, useSensors } from '@dnd-kit/core';
 import { arrayMove, SortableContext, sortableKeyboardCoordinates, verticalListSortingStrategy, useSortable } from '@dnd-kit/sortable';
@@ -22,7 +23,7 @@ const SortableTopicItem = ({ topic, selectedTopicId, onSelect, isReviewDue }: { 
   const style = { transform: CSS.Transform.toString(transform), transition };
 
   return (
-    <div ref={setNodeRef} style={style} {...attributes} {...listeners}>
+    <div ref={setNodeRef} style={style} className="relative group">
       <div
         onClick={() => onSelect(topic.id)}
         className={`p-4 rounded-2xl border transition-all cursor-pointer relative mb-3 ${selectedTopicId === topic.id ? 'border-blue-500 bg-blue-50/50 dark:bg-blue-900/30' : 'border-slate-100 dark:border-slate-800 bg-white dark:bg-slate-900 hover:border-blue-300'}`}
@@ -36,7 +37,13 @@ const SortableTopicItem = ({ topic, selectedTopicId, onSelect, isReviewDue }: { 
         <div className="flex justify-between items-start">
           <div className="flex-1 min-w-0 pr-4">
             <h4 className="font-bold text-slate-800 dark:text-slate-100 truncate flex items-center gap-2">
-              <span className="text-slate-300 cursor-grab">⋮⋮</span>
+              <span
+                {...attributes}
+                {...listeners}
+                className="text-slate-300 cursor-grab hover:text-slate-500 active:cursor-grabbing p-1"
+              >
+                ⋮⋮
+              </span>
               {topic.title}
             </h4>
             <div className="flex items-center gap-2 mt-1">
@@ -58,6 +65,7 @@ const AreaView: React.FC<AreaViewProps> = ({ area, onUpdateArea, onDeleteArea })
   const [aiResponse, setAiResponse] = useState<string | null>(null);
   const [loadingAI, setLoadingAI] = useState(false);
   const [isAddingTopic, setIsAddingTopic] = useState(false);
+  const [showResourceModal, setShowResourceModal] = useState(false);
   const [newTopicData, setNewTopicData] = useState({ title: '', description: '' });
   const [viewMode, setViewMode] = useState<'kanban' | 'detail' | 'tree'>('kanban');
   const [showTimer, setShowTimer] = useState(false);
@@ -213,30 +221,24 @@ const AreaView: React.FC<AreaViewProps> = ({ area, onUpdateArea, onDeleteArea })
   };
 
   const addResource = (topicId: string) => {
-    const title = prompt("Título del material:");
-    const url = prompt("URL:");
-    const description = prompt("Breve descripción (opcional):") || "";
-    if (!title || !url) return;
+    // Should select topic first if not already (although button is usually in context)
+    if (selectedTopicId !== topicId) setSelectedTopicId(topicId);
+    setShowResourceModal(true);
+  };
 
-    const isYoutube = url.includes('youtube.com') || url.includes('youtu.be');
-    let type: ResourceType = isYoutube ? 'video' : 'link';
-
-    if (!isYoutube) {
-      const typeInput = prompt("Tipo (link, book, pdf, other):", "link") as ResourceType;
-      type = ['link', 'book', 'pdf', 'other'].includes(typeInput) ? typeInput : 'link';
-    }
-
+  const handleSaveResource = (resourceData: { title: string; url: string; description: string; type: ResourceType }) => {
     const newResource: Resource = {
       id: Math.random().toString(36).substr(2, 9),
-      title,
-      url,
-      description,
-      type,
+      title: resourceData.title,
+      url: resourceData.url,
+      description: resourceData.description,
+      type: resourceData.type,
       watched: false,
       videoNotes: ''
     };
     setTopicResources(prev => [...prev, newResource]);
     setHasUnsavedChanges(true);
+    setShowResourceModal(false);
   };
 
   const updateResource = (resId: string, updates: Partial<Resource>) => {
@@ -583,6 +585,14 @@ const AreaView: React.FC<AreaViewProps> = ({ area, onUpdateArea, onDeleteArea })
             </div>
           </div>
         </div>
+      )}
+
+      {/* Resource Modal */}
+      {showResourceModal && (
+        <ResourceModal
+          onClose={() => setShowResourceModal(false)}
+          onSave={handleSaveResource}
+        />
       )}
     </div>
   );

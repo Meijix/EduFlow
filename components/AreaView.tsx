@@ -153,6 +153,9 @@ const AreaView: React.FC<AreaViewProps> = ({ area, onUpdateArea, onDeleteArea })
     alert(success ? "¡Buen trabajo! Nivel de repaso actualizado." : "Repasaremos este tema pronto para reforzarlo.");
   };
 
+  const [isSpeaking, setIsSpeaking] = useState(false);
+  const [loadingFlashcards, setLoadingFlashcards] = useState(false);
+
   const startQuiz = async () => {
     if (!selectedTopic) return;
     setLoadingQuiz(true);
@@ -165,170 +168,166 @@ const AreaView: React.FC<AreaViewProps> = ({ area, onUpdateArea, onDeleteArea })
     } finally {
       setLoadingQuiz(false);
     }
+  };
 
+  const toggleSpeech = () => {
+    if (isSpeaking) {
+      window.speechSynthesis.cancel();
+      setIsSpeaking(false);
+    } else {
+      const text = selectedTopic?.notes || selectedTopic?.description || '';
+      if (!text) return;
 
-    const [isSpeaking, setIsSpeaking] = useState(false);
+      const utterance = new SpeechSynthesisUtterance(text);
+      utterance.lang = 'es-ES';
+      utterance.rate = 1;
+      utterance.pitch = 1;
 
-    const toggleSpeech = () => {
-      if (isSpeaking) {
-        window.speechSynthesis.cancel();
-        setIsSpeaking(false);
-      } else {
-        const text = selectedTopic?.notes || selectedTopic?.description || '';
-        if (!text) return;
+      utterance.onend = () => setIsSpeaking(false);
 
-        const utterance = new SpeechSynthesisUtterance(text);
-        utterance.lang = 'es-ES';
-        utterance.rate = 1;
-        utterance.pitch = 1;
+      window.speechSynthesis.speak(utterance);
+      setIsSpeaking(true);
+    }
+  };
 
-        utterance.onend = () => setIsSpeaking(false);
-
-        window.speechSynthesis.speak(utterance);
-        setIsSpeaking(true);
-      }
-    };
-
-    const [loadingFlashcards, setLoadingFlashcards] = useState(false);
-
-    const handleGenerateFlashcards = async () => {
-      if (!selectedTopic) return;
-      setLoadingFlashcards(true);
-      try {
-        const cardsData = await generateFlashcards(selectedTopic.title, selectedTopic.notes || selectedTopic.description);
-        const newFlashcards = cardsData.map(c => ({
-          id: Math.random().toString(36).substr(2, 9),
-          ...c
-        }));
-
-        const updatedTopics = area.topics.map(t =>
-          t.id === selectedTopic.id ? { ...t, flashcards: newFlashcards } : t
-        );
-        onUpdateArea({ ...area, topics: updatedTopics });
-      } catch (err) {
-        alert("Error generando flashcards.");
-        console.error(err);
-      } finally {
-        setLoadingFlashcards(false);
-      }
-    };
-
-    const handleGeneratePlan = async () => {
-      setLoadingPlan(true);
-      try {
-        const plan = await generateStudyPlan(area.name);
-        const newTopics: Topic[] = plan.recommendedTopics.map(t => ({
-          id: Math.random().toString(36).substr(2, 9),
-          title: t.title,
-          description: t.description,
-          status: StudyStatus.PENDING,
-          notes: '',
-          resources: [],
-          timeSpent: 0,
-          reviewLevel: 0
-        }));
-        onUpdateArea({ ...area, topics: [...area.topics, ...newTopics] });
-      } catch (err) {
-        console.error(err);
-        alert("Error generando el plan con IA.");
-      } finally {
-        setLoadingPlan(false);
-      }
-    };
-
-    const handleAddManualTopic = () => {
-      if (!newTopicData.title.trim()) return;
-      const newTopic: Topic = {
+  const handleGenerateFlashcards = async () => {
+    if (!selectedTopic) return;
+    setLoadingFlashcards(true);
+    try {
+      const cardsData = await generateFlashcards(selectedTopic.title, selectedTopic.notes || selectedTopic.description);
+      const newFlashcards = cardsData.map(c => ({
         id: Math.random().toString(36).substr(2, 9),
-        title: newTopicData.title,
-        description: newTopicData.description,
+        ...c
+      }));
+
+      const updatedTopics = area.topics.map(t =>
+        t.id === selectedTopic.id ? { ...t, flashcards: newFlashcards } : t
+      );
+      onUpdateArea({ ...area, topics: updatedTopics });
+    } catch (err) {
+      alert("Error generando flashcards.");
+      console.error(err);
+    } finally {
+      setLoadingFlashcards(false);
+    }
+  };
+
+  const handleGeneratePlan = async () => {
+    setLoadingPlan(true);
+    try {
+      const plan = await generateStudyPlan(area.name);
+      const newTopics: Topic[] = plan.recommendedTopics.map(t => ({
+        id: Math.random().toString(36).substr(2, 9),
+        title: t.title,
+        description: t.description,
         status: StudyStatus.PENDING,
         notes: '',
         resources: [],
         timeSpent: 0,
         reviewLevel: 0
-      };
-      onUpdateArea({ ...area, topics: [...area.topics, newTopic] });
-      setNewTopicData({ title: '', description: '' });
-      setIsAddingTopic(false);
-      setActiveTopicId(newTopic.id);
-      setViewMode('detail');
+      }));
+      onUpdateArea({ ...area, topics: [...area.topics, ...newTopics] });
+    } catch (err) {
+      console.error(err);
+      alert("Error generando el plan con IA.");
+    } finally {
+      setLoadingPlan(false);
+    }
+  };
+
+  const handleAddManualTopic = () => {
+    if (!newTopicData.title.trim()) return;
+    const newTopic: Topic = {
+      id: Math.random().toString(36).substr(2, 9),
+      title: newTopicData.title,
+      description: newTopicData.description,
+      status: StudyStatus.PENDING,
+      notes: '',
+      resources: [],
+      timeSpent: 0,
+      reviewLevel: 0
     };
+    onUpdateArea({ ...area, topics: [...area.topics, newTopic] });
+    setNewTopicData({ title: '', description: '' });
+    setIsAddingTopic(false);
+    setActiveTopicId(newTopic.id);
+    setViewMode('detail');
+  };
 
-    const handleAskAI = async (topicTitle: string) => {
-      const q = prompt(`¿Qué quieres preguntarle a la IA sobre "${topicTitle}"?`);
-      if (!q) return;
-      setLoadingAI(true);
-      try {
-        const res = await getAITutorExplanation(topicTitle, q);
-        setAiResponse(res || "No se obtuvo respuesta.");
-      } catch (err) {
-        alert("Error al contactar al tutor AI.");
-      } finally {
-        setLoadingAI(false);
-      }
+  const handleAskAI = async (topicTitle: string) => {
+    const q = prompt(`¿Qué quieres preguntarle a la IA sobre "${topicTitle}"?`);
+    if (!q) return;
+    setLoadingAI(true);
+    try {
+      const res = await getAITutorExplanation(topicTitle, q);
+      setAiResponse(res || "No se obtuvo respuesta.");
+    } catch (err) {
+      alert("Error al contactar al tutor AI.");
+    } finally {
+      setLoadingAI(false);
+    }
+  };
+
+  const addResource = (topicId: string) => {
+    // Should select topic first if not already (although button is usually in context)
+    if (activeTopicId !== topicId) setActiveTopicId(topicId);
+    setShowResourceModal(true);
+  };
+
+  const handleSaveResource = (resourceData: { title: string; url: string; description: string; type: ResourceType }) => {
+    const newResource: Resource = {
+      id: Math.random().toString(36).substr(2, 9),
+      title: resourceData.title,
+      url: resourceData.url,
+      description: resourceData.description,
+      type: resourceData.type,
+      watched: false,
+      videoNotes: ''
     };
+    setTopicResources(prev => [...prev, newResource]);
+    setHasUnsavedChanges(true);
+    setShowResourceModal(false);
+  };
 
-    const addResource = (topicId: string) => {
-      // Should select topic first if not already (although button is usually in context)
-      if (activeTopicId !== topicId) setActiveTopicId(topicId);
-      setShowResourceModal(true);
-    };
+  const updateResource = (resId: string, updates: Partial<Resource>) => {
+    setTopicResources(prev => prev.map(r => r.id === resId ? { ...r, ...updates } : r));
+    setHasUnsavedChanges(true);
+  };
 
-    const handleSaveResource = (resourceData: { title: string; url: string; description: string; type: ResourceType }) => {
-      const newResource: Resource = {
-        id: Math.random().toString(36).substr(2, 9),
-        title: resourceData.title,
-        url: resourceData.url,
-        description: resourceData.description,
-        type: resourceData.type,
-        watched: false,
-        videoNotes: ''
-      };
-      setTopicResources(prev => [...prev, newResource]);
-      setHasUnsavedChanges(true);
-      setShowResourceModal(false);
-    };
+  const removeResource = (resourceId: string) => {
+    setTopicResources(prev => prev.filter(r => r.id !== resourceId));
+    setHasUnsavedChanges(true);
+  };
 
-    const updateResource = (resId: string, updates: Partial<Resource>) => {
-      setTopicResources(prev => prev.map(r => r.id === resId ? { ...r, ...updates } : r));
-      setHasUnsavedChanges(true);
-    };
+  const moveResource = (index: number, direction: 'up' | 'down') => {
+    const newResources = [...topicResources];
+    const targetIndex = direction === 'up' ? index - 1 : index + 1;
+    if (targetIndex < 0 || targetIndex >= newResources.length) return;
 
-    const removeResource = (resourceId: string) => {
-      setTopicResources(prev => prev.filter(r => r.id !== resourceId));
-      setHasUnsavedChanges(true);
-    };
+    [newResources[index], newResources[targetIndex]] = [newResources[targetIndex], newResources[index]];
+    setTopicResources(newResources);
+    setHasUnsavedChanges(true);
+  };
 
-    const moveResource = (index: number, direction: 'up' | 'down') => {
-      const newResources = [...topicResources];
-      const targetIndex = direction === 'up' ? index - 1 : index + 1;
-      if (targetIndex < 0 || targetIndex >= newResources.length) return;
+  const isReviewDue = (topic: Topic) => {
+    if (!topic.nextReviewAt) return false;
+    return new Date(topic.nextReviewAt) <= new Date();
+  };
 
-      [newResources[index], newResources[targetIndex]] = [newResources[targetIndex], newResources[index]];
-      setTopicResources(newResources);
-      setHasUnsavedChanges(true);
-    };
+  const videoResources = topicResources.filter(r => r.type === 'video');
+  const otherResources = topicResources.filter(r => r.type !== 'video');
 
-    const isReviewDue = (topic: Topic) => {
-      if (!topic.nextReviewAt) return false;
-      return new Date(topic.nextReviewAt) <= new Date();
-    };
+  const getResourceIcon = (type: ResourceType) => {
+    switch (type) {
+      case 'video': return '📺';
+      case 'pdf': return '📄';
+      case 'book': return '📖';
+      case 'link': return '🔗';
+      default: return '📁';
+    }
+  };
 
-    const videoResources = topicResources.filter(r => r.type === 'video');
-    const otherResources = topicResources.filter(r => r.type !== 'video');
-
-    const getResourceIcon = (type: ResourceType) => {
-      switch (type) {
-        case 'video': return '📺';
-        case 'pdf': return '📄';
-        case 'book': return '📖';
-        case 'link': return '🔗';
-        default: return '📁';
-      }
-    };
-
-    return (
+  return (
       <div className="space-y-6 animate-fade-in pb-20">
         <header className="flex flex-col md:flex-row md:items-center justify-between gap-4">
           <div className="flex items-center gap-4">
@@ -717,7 +716,7 @@ const AreaView: React.FC<AreaViewProps> = ({ area, onUpdateArea, onDeleteArea })
           />
         )}
       </div>
-    );
-  };
+  );
+};
 
-  export default AreaView;
+export default AreaView;

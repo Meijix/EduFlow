@@ -65,6 +65,32 @@ export const generateQuiz = async (topicTitle: string, notes: string): Promise<Q
   return JSON.parse(response.text || '[]') as QuizQuestion[];
 };
 
+export const generateFlashcards = async (topicTitle: string, notes: string): Promise<{ front: string, back: string }[]> => {
+  const response = await ai.models.generateContent({
+    model: 'gemini-2.0-flash',
+    contents: `Genera 5 flashcards (tarjetas de estudio) para el tema "${topicTitle}".
+    Usa estas notas como base: "${notes}".
+    Cada flashcard debe tener un "front" (pregunta o concepto clave) y un "back" (respuesta o explicación breve).
+    Si las notas son cortas, usa tu conocimiento general para completar las 5 tarjetas.`,
+    config: {
+      responseMimeType: "application/json",
+      responseSchema: {
+        type: Type.ARRAY,
+        items: {
+          type: Type.OBJECT,
+          properties: {
+            front: { type: Type.STRING },
+            back: { type: Type.STRING }
+          },
+          required: ["front", "back"]
+        }
+      }
+    }
+  });
+
+  return JSON.parse(response.text || '[]') as { front: string, back: string }[];
+};
+
 export const getAITutorExplanation = async (topic: string, question: string) => {
   const response = await ai.models.generateContent({
     model: 'gemini-3-pro-preview',

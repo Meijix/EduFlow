@@ -18,6 +18,12 @@ export interface Resource {
   videoNotes?: string;
 }
 
+export interface Flashcard {
+  id: string;
+  front: string;
+  back: string;
+}
+
 export interface Topic {
   id: string;
   title: string;
@@ -25,6 +31,7 @@ export interface Topic {
   status: StudyStatus;
   notes: string;
   resources: Resource[];
+  flashcards?: Flashcard[]; // New
   timeSpent: number; // In seconds
   lastStudied?: string;
   reviewLevel: number; // 0 to 6

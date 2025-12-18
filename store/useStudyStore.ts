@@ -8,6 +8,7 @@ interface StudyState {
   areas: StudyArea[];
   studyLogs: StudyLog[];
   activeAreaId: string | null;
+  activeTopicId: string | null;  // New
   isDarkMode: boolean;
   isLoading: boolean;
 
@@ -15,6 +16,7 @@ interface StudyState {
   init: () => Promise<void>;
   toggleDarkMode: () => void;
   setActiveAreaId: (id: string | null) => void;
+  setActiveTopicId: (id: string | null) => void; // New
   addArea: (name: string) => Promise<void>;
   updateArea: (updatedArea: StudyArea) => Promise<void>;
   deleteArea: (id: string) => Promise<void>;
@@ -29,6 +31,7 @@ export const useStudyStore = create<StudyState>()(
       areas: [],
       studyLogs: [],
       activeAreaId: null,
+      activeTopicId: null, // New
       isDarkMode: false,
       isLoading: true,
 
@@ -67,7 +70,8 @@ export const useStudyStore = create<StudyState>()(
         set({ isDarkMode: next });
       },
 
-      setActiveAreaId: (id) => set({ activeAreaId: id }),
+      setActiveAreaId: (id) => set({ activeAreaId: id, activeTopicId: null }), // Reset topic on area change
+      setActiveTopicId: (id) => set({ activeTopicId: id }), // New
 
       addArea: async (name) => {
         const icons = ['🧠', '💻', '🌍', '📊', '🔬', '🎨', '📜', '⚖️', '🏔️', '🧬', '🎼', '🚀'];

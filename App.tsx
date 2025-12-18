@@ -3,6 +3,7 @@ import React, { useState, useEffect } from 'react';
 import Sidebar from './components/Sidebar';
 import Dashboard from './components/Dashboard';
 import AreaView from './components/AreaView';
+import GlobalTimer from './components/GlobalTimer'; // New
 import { useStudyStore } from './store/useStudyStore';
 
 const App: React.FC = () => {
@@ -35,16 +36,16 @@ const App: React.FC = () => {
   return (
     <div className="flex min-h-screen bg-slate-50 dark:bg-slate-950 transition-colors duration-300 selection:bg-blue-200 dark:selection:bg-blue-900/50">
       <Sidebar onAddArea={() => setIsAddingArea(true)} />
-      
+
       <main className="flex-1 p-8 lg:p-12 overflow-y-auto custom-scrollbar">
         <div className="max-w-6xl mx-auto">
           {!activeAreaId ? (
             <Dashboard areas={areas} logs={studyLogs} />
           ) : activeArea ? (
-            <AreaView 
-              area={activeArea} 
-              onUpdateArea={updateArea} 
-              onDeleteArea={deleteArea} 
+            <AreaView
+              area={activeArea}
+              onUpdateArea={updateArea}
+              onDeleteArea={deleteArea}
             />
           ) : null}
         </div>
@@ -55,7 +56,7 @@ const App: React.FC = () => {
           <div className="bg-white dark:bg-slate-900 rounded-3xl shadow-2xl max-w-md w-full p-8 animate-scale-in border border-slate-100 dark:border-slate-800">
             <div className="w-16 h-16 bg-blue-50 dark:bg-blue-900/30 rounded-2xl flex items-center justify-center mb-6 text-3xl">🧩</div>
             <h3 className="text-2xl font-black text-slate-800 dark:text-white mb-2">Nueva Área Maestra</h3>
-            <input 
+            <input
               type="text" autoFocus className="w-full px-5 py-4 rounded-2xl bg-slate-50 dark:bg-slate-800 border-none focus:ring-2 focus:ring-blue-500 mb-8 text-lg font-bold dark:text-white"
               placeholder="Ej: Física Cuántica, UX Design..."
               value={newAreaName} onChange={(e) => setNewAreaName(e.target.value)} onKeyDown={(e) => e.key === 'Enter' && handleAddArea()}
@@ -67,6 +68,8 @@ const App: React.FC = () => {
           </div>
         </div>
       )}
+
+      <GlobalTimer />
 
       <style>{`
         @keyframes fade-in { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }

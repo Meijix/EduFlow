@@ -59,16 +59,18 @@ const SortableTopicItem = ({ topic, selectedTopicId, onSelect, isReviewDue }: { 
 
 
 const AreaView: React.FC<AreaViewProps> = ({ area, onUpdateArea, onDeleteArea }) => {
-  const { reorderTopics } = useStudyStore();
+  const { reorderTopics, activeTopicId, setActiveTopicId } = useStudyStore();
   const [loadingPlan, setLoadingPlan] = useState(false);
-  const [selectedTopicId, setSelectedTopicId] = useState<string | null>(null);
+  // Remove local selectedTopicId state
+  // const [selectedTopicId, setSelectedTopicId] = useState<string | null>(null);
   const [aiResponse, setAiResponse] = useState<string | null>(null);
   const [loadingAI, setLoadingAI] = useState(false);
   const [isAddingTopic, setIsAddingTopic] = useState(false);
   const [showResourceModal, setShowResourceModal] = useState(false);
   const [newTopicData, setNewTopicData] = useState({ title: '', description: '' });
   const [viewMode, setViewMode] = useState<'kanban' | 'detail' | 'tree'>('kanban');
-  const [showTimer, setShowTimer] = useState(false);
+  // Remove local showTimer
+  // const [showTimer, setShowTimer] = useState(false);
   const [isQuizMode, setIsQuizMode] = useState(false);
   const [quizQuestions, setQuizQuestions] = useState<QuizQuestion[]>([]);
   const [loadingQuiz, setLoadingQuiz] = useState(false);
@@ -94,7 +96,7 @@ const AreaView: React.FC<AreaViewProps> = ({ area, onUpdateArea, onDeleteArea })
   const [topicResources, setTopicResources] = useState<Resource[]>([]);
   const [hasUnsavedChanges, setHasUnsavedChanges] = useState(false);
 
-  const selectedTopic = area.topics.find(t => t.id === selectedTopicId) || null;
+  const selectedTopic = area.topics.find(t => t.id === activeTopicId) || null;
 
   useEffect(() => {
     if (selectedTopic) {
@@ -104,21 +106,21 @@ const AreaView: React.FC<AreaViewProps> = ({ area, onUpdateArea, onDeleteArea })
       setTopicResources(selectedTopic.resources || []);
       setHasUnsavedChanges(false);
     }
-  }, [selectedTopicId]);
+  }, [activeTopicId]);
 
   const handleSaveTopic = () => {
-    if (!selectedTopicId) return;
+    if (!activeTopicId) return;
     const updatedTopics = area.topics.map(t =>
-      t.id === selectedTopicId ? { ...t, title: editTopicTitle, description: editTopicDesc, notes: editTopicNotes, resources: topicResources } : t
+      t.id === activeTopicId ? { ...t, title: editTopicTitle, description: editTopicDesc, notes: editTopicNotes, resources: topicResources } : t
     );
     onUpdateArea({ ...area, topics: updatedTopics });
     setHasUnsavedChanges(false);
   };
 
   const updateTimeSpent = (seconds: number) => {
-    if (!selectedTopicId) return;
+    if (!activeTopicId) return;
     const updatedTopics = area.topics.map(t =>
-      t.id === selectedTopicId ? { ...t, timeSpent: (t.timeSpent || 0) + seconds } : t
+      t.id === activeTopicId ? { ...t, timeSpent: (t.timeSpent || 0) + seconds } : t
     );
     onUpdateArea({ ...area, topics: updatedTopics });
   };
@@ -202,7 +204,7 @@ const AreaView: React.FC<AreaViewProps> = ({ area, onUpdateArea, onDeleteArea })
     onUpdateArea({ ...area, topics: [...area.topics, newTopic] });
     setNewTopicData({ title: '', description: '' });
     setIsAddingTopic(false);
-    setSelectedTopicId(newTopic.id);
+    setActiveTopicId(newTopic.id);
     setViewMode('detail');
   };
 
@@ -222,7 +224,7 @@ const AreaView: React.FC<AreaViewProps> = ({ area, onUpdateArea, onDeleteArea })
 
   const addResource = (topicId: string) => {
     // Should select topic first if not already (although button is usually in context)
-    if (selectedTopicId !== topicId) setSelectedTopicId(topicId);
+    if (activeTopicId !== topicId) setActiveTopicId(topicId);
     setShowResourceModal(true);
   };
 
@@ -321,14 +323,14 @@ const AreaView: React.FC<AreaViewProps> = ({ area, onUpdateArea, onDeleteArea })
         <KanbanBoard
           topics={area.topics}
           onMoveTopic={moveTopic}
-          onSelectTopic={(id) => { setSelectedTopicId(id); setViewMode('detail'); }}
+          onSelectTopic={(id) => { setActiveTopicId(id); setViewMode('detail'); }}
         />
       )}
 
       {viewMode === 'tree' && (
         <SkillTree
           topics={area.topics}
-          onSelectTopic={(id) => { setSelectedTopicId(id); setViewMode('detail'); }}
+          onSelectTopic={(id) => { setActiveTopicId(id); setViewMode('detail'); }}
         />
       )}
 
@@ -341,8 +343,8 @@ const AreaView: React.FC<AreaViewProps> = ({ area, onUpdateArea, onDeleteArea })
                   <SortableTopicItem
                     key={topic.id}
                     topic={topic}
-                    selectedTopicId={selectedTopicId}
-                    onSelect={setSelectedTopicId}
+                    selectedTopicId={activeTopicId}
+                    onSelect={setActiveTopicId}
                     isReviewDue={isReviewDue}
                   />
                 ))}
@@ -369,10 +371,7 @@ const AreaView: React.FC<AreaViewProps> = ({ area, onUpdateArea, onDeleteArea })
                         <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
                         {Math.floor(selectedTopic.timeSpent / 3600)}h {Math.floor((selectedTopic.timeSpent % 3600) / 60)}m
                       </span>
-                      <button onClick={() => setShowTimer(!showTimer)} className="text-blue-500 hover:text-blue-600 flex items-center gap-1">
-                        <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M13 10V3L4 14h7v7l9-11h-7z" /></svg>
-                        {showTimer ? 'Cerrar Pomodoro' : 'Timer Pomodoro'}
-                      </button>
+                      {/* Removed local timer button/logic */}
                     </div>
                   </div>
                   <div className="flex gap-2">
@@ -387,11 +386,7 @@ const AreaView: React.FC<AreaViewProps> = ({ area, onUpdateArea, onDeleteArea })
                   </div>
                 </div>
 
-                {showTimer && (
-                  <div className="mb-8">
-                    <Timer topicTitle={editTopicTitle} onTimeUpdate={updateTimeSpent} />
-                  </div>
-                )}
+                {/* Timer removed from here */}
 
                 <div className="flex-1 space-y-8">
                   {/* Spaced Repetition Bar */}
@@ -554,9 +549,9 @@ const AreaView: React.FC<AreaViewProps> = ({ area, onUpdateArea, onDeleteArea })
             onComplete={(score) => {
               setIsQuizMode(false);
               if (score > quizQuestions.length * 0.7) {
-                handleCompleteReview(selectedTopicId!, true);
+                handleCompleteReview(activeTopicId!, true);
               } else {
-                handleCompleteReview(selectedTopicId!, false);
+                handleCompleteReview(activeTopicId!, false);
               }
             }}
           />

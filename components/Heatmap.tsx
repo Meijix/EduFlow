@@ -17,23 +17,23 @@ const Heatmap: React.FC<HeatmapProps> = ({ logs }) => {
   });
 
   const getColor = (count: number) => {
-    if (count === 0) return 'bg-[#30363d]';
-    if (count < 10) return 'bg-lime-900/50';
-    if (count < 30) return 'bg-lime-700';
-    if (count < 60) return 'bg-lime-500';
-    return 'bg-lime-400 shadow-[0_0_10px_rgba(190,242,100,0.5)]';
+    if (count === 0) return 'bg-slate-100 dark:bg-[#30363d]';
+    if (count < 10) return 'bg-blue-200 dark:bg-lime-900/50';
+    if (count < 30) return 'bg-blue-400 dark:bg-lime-700';
+    if (count < 60) return 'bg-blue-600 dark:bg-lime-500';
+    return 'bg-blue-800 dark:bg-lime-400 shadow-sm dark:shadow-[0_0_10px_rgba(190,242,100,0.5)]';
   };
 
   return (
-    <div className="bg-[#161B22] p-8 rounded-3xl border border-[#30363d] shadow-xl shadow-black/50">
+    <div className="bg-white dark:bg-[#161B22] p-8 rounded-3xl border border-slate-200 dark:border-[#30363d] shadow-sm dark:shadow-xl dark:shadow-black/50">
       <div className="flex items-center justify-between mb-6">
-        <h4 className="text-sm font-black text-slate-400 uppercase tracking-widest">Consistencia de Estudio</h4>
+        <h4 className="text-sm font-black text-slate-400 dark:text-slate-400 uppercase tracking-widest">Consistencia de Estudio</h4>
         <div className="flex items-center gap-1 text-[10px] text-slate-500 font-bold">
           <span>Menos</span>
-          <div className="w-2 h-2 rounded-sm bg-[#30363d]"></div>
-          <div className="w-2 h-2 rounded-sm bg-lime-900/50"></div>
-          <div className="w-2 h-2 rounded-sm bg-lime-500"></div>
-          <div className="w-2 h-2 rounded-sm bg-lime-400"></div>
+          <div className="w-2 h-2 rounded-sm bg-slate-100 dark:bg-[#30363d]"></div>
+          <div className="w-2 h-2 rounded-sm bg-blue-200 dark:bg-lime-900/50"></div>
+          <div className="w-2 h-2 rounded-sm bg-blue-600 dark:bg-lime-500"></div>
+          <div className="w-2 h-2 rounded-sm bg-blue-800 dark:bg-lime-400"></div>
           <span>Más</span>
         </div>
       </div>
@@ -46,7 +46,7 @@ const Heatmap: React.FC<HeatmapProps> = ({ logs }) => {
           ></div>
         ))}
       </div>
-      <p className="text-[10px] text-slate-500 mt-6 text-center font-medium">Visualizando los últimos 105 días de progreso.</p>
+      <p className="text-[10px] text-slate-400 dark:text-slate-500 mt-6 text-center font-medium">Visualizando los últimos 105 días de progreso.</p>
     </div>
   );
 };

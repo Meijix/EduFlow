@@ -28,9 +28,9 @@ const SortableAreaItem: React.FC<{ area: StudyArea, isActive: boolean, onClick: 
     <div ref={setNodeRef} style={style} className="relative group">
       <button
         onClick={onClick}
-        className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl transition-all text-left pr-10 ${isActive ? 'bg-lime-400 text-black font-extrabold shadow-lg shadow-lime-400/20' : 'text-slate-400 hover:bg-[#0F1115] hover:text-white'}`}
+        className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl transition-all text-left pr-10 ${isActive ? 'bg-blue-50 dark:bg-lime-400 text-blue-700 dark:text-black font-extrabold shadow-sm dark:shadow-lg dark:shadow-lime-400/20' : 'text-slate-500 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-[#0F1115] hover:text-slate-900 dark:hover:text-white'}`}
       >
-        <span className="text-xl bg-[#0F1115] w-10 h-10 flex items-center justify-center rounded-lg shadow-sm border border-[#30363d]">{area.icon || '📚'}</span>
+        <span className="text-xl bg-white dark:bg-[#0F1115] w-10 h-10 flex items-center justify-center rounded-lg shadow-sm border border-slate-200 dark:border-[#30363d]">{area.icon || '📚'}</span>
         <span className="truncate flex-1">{area.name}</span>
       </button>
       <span
@@ -64,17 +64,17 @@ const Sidebar: React.FC<SidebarProps> = ({ onAddArea }) => {
   };
 
   return (
-    <aside className="w-72 bg-[#161B22] border-r border-[#30363d] h-screen sticky top-0 flex flex-col transition-colors duration-300">
-      <div className="p-6 border-b border-[#30363d] flex items-center justify-between">
-        <h1 className="text-xl font-bold text-lime-400 flex items-center gap-2 cursor-pointer" onClick={() => setActiveAreaId(null)}>
-          <svg className="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+    <aside className="w-72 bg-white dark:bg-[#161B22] border-r border-slate-200 dark:border-[#30363d] h-screen sticky top-0 flex flex-col transition-colors duration-300">
+      <div className="p-6 border-b border-slate-200 dark:border-[#30363d] flex items-center justify-between">
+        <h1 className="text-xl font-bold text-slate-900 dark:text-lime-400 flex items-center gap-2 cursor-pointer" onClick={() => setActiveAreaId(null)}>
+          <svg className="w-8 h-8 text-blue-600 dark:text-lime-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" />
           </svg>
-          EduStream
+          EduFlow
         </h1>
         <button
           onClick={toggleDarkMode}
-          className="p-2 rounded-lg bg-[#0F1115] text-slate-400 hover:ring-2 hover:ring-lime-400/50 transition-all"
+          className="p-2 rounded-lg bg-slate-100 dark:bg-[#0F1115] text-slate-500 dark:text-slate-400 hover:ring-2 hover:ring-blue-200 dark:hover:ring-lime-400/50 transition-all"
           title="Alternar Modo Oscuro"
         >
           {isDarkMode ? (
@@ -88,7 +88,7 @@ const Sidebar: React.FC<SidebarProps> = ({ onAddArea }) => {
       <nav className="flex-1 overflow-y-auto p-4 space-y-2 custom-scrollbar">
         <button
           onClick={() => setActiveAreaId(null)}
-          className={`w-full flex items-center gap-3 px-4 py-2 rounded-lg transition-colors ${!activeAreaId ? 'bg-lime-400 text-black font-bold shadow-lg shadow-lime-400/20' : 'text-slate-400 hover:bg-[#0F1115] hover:text-white'}`}
+          className={`w-full flex items-center gap-3 px-4 py-2 rounded-lg transition-colors ${!activeAreaId ? 'bg-blue-50 dark:bg-lime-400 text-blue-700 dark:text-black font-bold shadow-sm dark:shadow-lg dark:shadow-lime-400/20' : 'text-slate-500 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-[#0F1115] hover:text-slate-900 dark:hover:text-white'}`}
         >
           <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" />
@@ -96,7 +96,7 @@ const Sidebar: React.FC<SidebarProps> = ({ onAddArea }) => {
           Panel Principal
         </button>
 
-        <div className="pt-4 pb-2 text-xs font-bold text-slate-500 uppercase tracking-widest px-4">
+        <div className="pt-4 pb-2 text-xs font-bold text-slate-400 dark:text-slate-500 uppercase tracking-widest px-4">
           Mis Áreas de Estudio
         </div>
 
@@ -121,10 +121,10 @@ const Sidebar: React.FC<SidebarProps> = ({ onAddArea }) => {
         </DndContext>
       </nav>
 
-      <div className="p-4 border-t border-[#30363d]">
+      <div className="p-4 border-t border-slate-200 dark:border-[#30363d]">
         <button
           onClick={onAddArea}
-          className="w-full bg-[#0F1115] hover:bg-black text-lime-400 border border-lime-400/20 hover:border-lime-400/50 font-bold py-3 px-4 rounded-xl flex items-center justify-center gap-2 transition-transform active:scale-95"
+          className="w-full bg-slate-900 hover:bg-slate-800 dark:bg-[#0F1115] dark:hover:bg-black text-white dark:text-lime-400 border border-slate-700 dark:border-lime-400/20 hover:border-slate-500 dark:hover:border-lime-400/50 font-bold py-3 px-4 rounded-xl flex items-center justify-center gap-2 transition-transform active:scale-95"
         >
           <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 4v16m8-8H4" />

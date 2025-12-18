@@ -364,7 +364,15 @@ const AreaView: React.FC<AreaViewProps> = ({ area, onUpdateArea, onDeleteArea })
                         type="text"
                         value={editTopicTitle}
                         onChange={(e) => { setEditTopicTitle(e.target.value); setHasUnsavedChanges(true); }}
-                        className="text-3xl font-black text-white bg-transparent border-none focus:ring-0 p-0 w-full"
+                        className="text-3xl font-black text-slate-900 dark:text-white bg-transparent border-none focus:ring-0 p-0 w-full placeholder-slate-400"
+                        placeholder="Título del Tema"
+                      />
+                      <textarea
+                        value={editTopicDesc}
+                        onChange={(e) => { setEditTopicDesc(e.target.value); setHasUnsavedChanges(true); }}
+                        className="text-sm font-medium text-slate-500 dark:text-slate-400 bg-transparent border-none focus:ring-0 p-0 w-full resize-none h-auto placeholder-slate-400/50"
+                        placeholder="Añade una descripción breve..."
+                        rows={1}
                       />
                     </div>
                     <div className="flex items-center gap-4 text-xs font-bold text-slate-500">

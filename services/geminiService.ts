@@ -2,11 +2,11 @@
 import { GoogleGenAI, Type } from "@google/genai";
 import { StudyPlanResponse, QuizQuestion } from "../types";
 
-const ai = new GoogleGenAI({ apiKey: process.env.API_KEY || '' });
+const ai = new GoogleGenAI({ apiKey: import.meta.env.VITE_API_KEY || '' });
 
 export const generateStudyPlan = async (subject: string): Promise<StudyPlanResponse> => {
   const response = await ai.models.generateContent({
-    model: 'gemini-3-flash-preview',
+    model: 'gemini-1.5-flash',
     contents: `Crea un plan de estudio estructurado para el tema: "${subject}". 
     Proporciona una descripción general y una lista de 5 a 8 temas clave para dominar esta área.`,
     config: {
@@ -38,7 +38,7 @@ export const generateStudyPlan = async (subject: string): Promise<StudyPlanRespo
 
 export const generateQuiz = async (topicTitle: string, notes: string): Promise<QuizQuestion[]> => {
   const response = await ai.models.generateContent({
-    model: 'gemini-3-flash-preview',
+    model: 'gemini-1.5-flash',
     contents: `Genera un cuestionario de 5 preguntas de opción múltiple basado en el siguiente tema: "${topicTitle}". 
     Usa estas notas como contexto si es posible: "${notes}". 
     Asegúrate de que haya una sola respuesta correcta por pregunta.`,
@@ -67,7 +67,7 @@ export const generateQuiz = async (topicTitle: string, notes: string): Promise<Q
 
 export const generateFlashcards = async (topicTitle: string, notes: string): Promise<{ front: string, back: string }[]> => {
   const response = await ai.models.generateContent({
-    model: 'gemini-2.0-flash',
+    model: 'gemini-1.5-flash',
     contents: `Genera 5 flashcards (tarjetas de estudio) para el tema "${topicTitle}".
     Usa estas notas como base: "${notes}".
     Cada flashcard debe tener un "front" (pregunta o concepto clave) y un "back" (respuesta o explicación breve).
@@ -93,7 +93,7 @@ export const generateFlashcards = async (topicTitle: string, notes: string): Pro
 
 export const getAITutorExplanation = async (topic: string, question: string) => {
   const response = await ai.models.generateContent({
-    model: 'gemini-3-pro-preview',
+    model: 'gemini-1.5-flash',
     contents: `Actúa como un tutor experto en ${topic}. Explica de forma clara y pedagógica lo siguiente: ${question}`,
   });
   return response.text;

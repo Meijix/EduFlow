@@ -25,15 +25,21 @@ const SortableAreaItem: React.FC<{ area: StudyArea, isActive: boolean, onClick: 
   };
 
   return (
-    <div ref={setNodeRef} style={style} {...attributes} {...listeners}>
+    <div ref={setNodeRef} style={style} className="relative group">
       <button
         onClick={onClick}
-        className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl transition-all text-left ${isActive ? 'bg-blue-50 dark:bg-blue-900/40 text-blue-700 dark:text-blue-300 font-semibold ring-1 ring-blue-200 dark:ring-blue-800' : 'text-slate-600 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-800'}`}
+        className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl transition-all text-left pr-10 ${isActive ? 'bg-blue-50 dark:bg-blue-900/40 text-blue-700 dark:text-blue-300 font-semibold ring-1 ring-blue-200 dark:ring-blue-800' : 'text-slate-600 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-800'}`}
       >
         <span className="text-xl bg-white dark:bg-slate-800 w-10 h-10 flex items-center justify-center rounded-lg shadow-sm">{area.icon || '📚'}</span>
         <span className="truncate flex-1">{area.name}</span>
-        <span className="text-slate-300 dark:text-slate-600 cursor-grab px-2">⋮⋮</span>
       </button>
+      <span
+        {...attributes}
+        {...listeners}
+        className="absolute right-2 top-1/2 -translate-y-1/2 p-2 text-slate-300 dark:text-slate-600 cursor-grab hover:text-slate-500 active:cursor-grabbing z-10"
+      >
+        ⋮⋮
+      </span>
     </div>
   );
 };

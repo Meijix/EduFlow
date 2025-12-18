@@ -9,7 +9,7 @@ interface KanbanBoardProps {
   onSelectTopic: (topicId: string) => void;
 }
 
-const KanbanCard = ({ topic, onSelect }: { topic: Topic, onSelect: (id: string) => void }) => {
+const KanbanCard = ({ topic, onSelect }: { topic: Topic, onSelect: (id: string) => void } & React.HTMLAttributes<HTMLDivElement>) => {
   const { attributes, listeners, setNodeRef, transform } = useDraggable({
     id: topic.id,
   });
@@ -40,7 +40,7 @@ const KanbanCard = ({ topic, onSelect }: { topic: Topic, onSelect: (id: string) 
   );
 };
 
-const KanbanColumn = ({ id, title, color, topics, onSelectTopic }: { id: string, title: string, color: string, topics: Topic[], onSelectTopic: (id: string) => void }) => {
+const KanbanColumn = ({ id, title, color, topics, onSelectTopic }: { id: string, title: string, color: string, topics: Topic[], onSelectTopic: (id: string) => void } & React.HTMLAttributes<HTMLDivElement>) => {
   const { setNodeRef } = useDroppable({
     id: id,
   });
@@ -80,8 +80,8 @@ const KanbanBoard: React.FC<KanbanBoardProps> = ({ topics, onMoveTopic, onSelect
 
   const columns = [
     { id: StudyStatus.PENDING, title: 'Por aprender', color: 'bg-slate-200 dark:bg-slate-800' },
-    { id: StudyStatus.IN_PROGRESS, title: 'En proceso', color: 'bg-amber-100 dark:bg-amber-900/30' },
-    { id: StudyStatus.REVIEWING, title: 'Repasando', color: 'bg-blue-100 dark:bg-blue-900/30' },
+    { id: StudyStatus.IN_PROGRESS, title: 'En proceso', color: 'bg-blue-100 dark:bg-blue-900/30' },
+    { id: StudyStatus.REVIEWING, title: 'Repasando', color: 'bg-red-100 dark:bg-red-900/30' },
     { id: StudyStatus.COMPLETED, title: 'Dominado', color: 'bg-emerald-100 dark:bg-emerald-900/30' },
   ];
 

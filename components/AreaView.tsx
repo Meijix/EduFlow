@@ -17,7 +17,7 @@ interface AreaViewProps {
   onDeleteArea: (id: string) => void;
 }
 
-const SortableTopicItem = ({ topic, selectedTopicId, onSelect, isReviewDue }: { topic: Topic, selectedTopicId: string | null, onSelect: (id: string) => void, isReviewDue: (t: Topic) => boolean }) => {
+const SortableTopicItem = ({ topic, selectedTopicId, onSelect, isReviewDue }: { topic: Topic, selectedTopicId: string | null, onSelect: (id: string) => void, isReviewDue: (t: Topic) => boolean } & React.HTMLAttributes<HTMLDivElement>) => {
   const { attributes, listeners, setNodeRef, transform, transition } = useSortable({ id: topic.id });
   const style = { transform: CSS.Transform.toString(transform), transition };
 
@@ -283,7 +283,12 @@ const AreaView: React.FC<AreaViewProps> = ({ area, onUpdateArea, onDeleteArea })
         <div className="flex items-center gap-4">
           <span className="text-5xl bg-white dark:bg-slate-900 p-3 rounded-2xl shadow-sm border border-slate-100 dark:border-slate-800">{area.icon}</span>
           <div>
-            <h2 className="text-3xl font-black text-slate-800 dark:text-white">{area.name}</h2>
+            <input
+              type="text"
+              value={area.name}
+              onChange={(e) => onUpdateArea({ ...area, name: e.target.value })}
+              className="text-3xl font-black text-slate-800 dark:text-white bg-transparent border-none focus:ring-0 p-0 w-full"
+            />
             <div className="flex flex-wrap items-center gap-2 mt-2">
               <button
                 onClick={() => setViewMode('kanban')}
@@ -493,7 +498,7 @@ const AreaView: React.FC<AreaViewProps> = ({ area, onUpdateArea, onDeleteArea })
                               {res.type === 'video' && (
                                 <textarea
                                   placeholder="Notas del video..."
-                                  className="w-full bg-white dark:bg-slate-900/50 p-3 rounded-2xl border-none focus:ring-1 focus:ring-rose-500 text-xs h-20 resize-none dark:text-slate-300"
+                                  className="w-full bg-white dark:bg-slate-900/50 p-3 rounded-2xl border-none focus:ring-1 focus:ring-red-500 text-xs h-20 resize-none dark:text-slate-300"
                                   value={res.videoNotes || ''}
                                   onChange={(e) => updateResource(res.id, { videoNotes: e.target.value })}
                                 />
@@ -503,7 +508,7 @@ const AreaView: React.FC<AreaViewProps> = ({ area, onUpdateArea, onDeleteArea })
                             <div className="flex md:flex-col gap-2 justify-center pl-4 border-l border-slate-200 dark:border-slate-700">
                               <button
                                 onClick={() => removeResource(res.id)}
-                                className="p-2 text-rose-500 hover:bg-rose-100 dark:hover:bg-rose-900/30 rounded-xl transition-all"
+                                className="p-2 text-red-500 hover:bg-red-100 dark:hover:bg-red-900/30 rounded-xl transition-all"
                               >
                                 <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" /></svg>
                               </button>
@@ -523,7 +528,7 @@ const AreaView: React.FC<AreaViewProps> = ({ area, onUpdateArea, onDeleteArea })
                   <div className="mt-10 p-8 bg-blue-50 dark:bg-blue-900/20 rounded-3xl border border-blue-100 dark:border-blue-900/50 relative animate-fade-in shadow-inner">
                     <button onClick={() => setAiResponse(null)} className="absolute top-4 right-4 text-slate-400 hover:text-slate-600">✕</button>
                     <h4 className="text-blue-600 dark:text-blue-300 font-black mb-4 flex items-center gap-2 uppercase text-xs tracking-widest">Tutoría IA</h4>
-                    <div className="text-slate-700 dark:text-slate-300 whitespace-pre-wrap text-base leading-relaxed prose prose-blue dark:prose-invert">{aiResponse}</div>
+                    <div className="text-slate-700 dark:text-slate-300 whitespace-pre-wrap text-base leading-relaxed pred pred-blue dark:pred-invert">{aiResponse}</div>
                   </div>
                 )}
               </div>

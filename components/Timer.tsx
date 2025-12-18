@@ -51,7 +51,7 @@ const Timer: React.FC<TimerProps> = ({ topicTitle, onTimeUpdate }) => {
       <div className="flex gap-2">
         <button 
           onClick={toggleTimer}
-          className={`px-6 py-2 rounded-xl font-bold transition-all ${isActive ? 'bg-rose-500 hover:bg-rose-600' : 'bg-emerald-500 hover:bg-emerald-600'}`}
+          className={`px-6 py-2 rounded-xl font-bold transition-all ${isActive ? 'bg-red-500 hover:bg-red-600' : 'bg-emerald-500 hover:bg-emerald-600'}`}
         >
           {isActive ? 'Pausar' : 'Empezar'}
         </button>

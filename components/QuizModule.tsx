@@ -49,7 +49,7 @@ const QuizModule: React.FC<QuizModuleProps> = ({ questions, onComplete, onCancel
     <div className="bg-white dark:bg-slate-900 p-8 rounded-3xl animate-scale-in border border-slate-100 dark:border-slate-800 shadow-xl max-w-2xl w-full">
       <div className="flex justify-between items-center mb-8">
         <span className="text-xs font-black uppercase tracking-widest text-slate-400">Pregunta {currentIndex + 1} de {questions.length}</span>
-        <button onClick={onCancel} className="text-slate-400 hover:text-rose-500">
+        <button onClick={onCancel} className="text-slate-400 hover:text-red-500">
           <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12" /></svg>
         </button>
       </div>

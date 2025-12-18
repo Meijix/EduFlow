@@ -6,6 +6,10 @@ import Timer from './Timer';
 import KanbanBoard from './KanbanBoard';
 import QuizModule from './QuizModule';
 import SkillTree from './SkillTree';
+import { useStudyStore } from '../store/useStudyStore';
+import { DndContext, closestCenter, DragEndEvent, KeyboardSensor, PointerSensor, useSensor, useSensors } from '@dnd-kit/core';
+import { arrayMove, SortableContext, sortableKeyboardCoordinates, verticalListSortingStrategy, useSortable } from '@dnd-kit/sortable';
+import { CSS } from '@dnd-kit/utilities';
 
 interface AreaViewProps {
   area: StudyArea;
@@ -13,7 +17,42 @@ interface AreaViewProps {
   onDeleteArea: (id: string) => void;
 }
 
+const SortableTopicItem = ({ topic, selectedTopicId, onSelect, isReviewDue }: { topic: Topic, selectedTopicId: string | null, onSelect: (id: string) => void, isReviewDue: (t: Topic) => boolean }) => {
+  const { attributes, listeners, setNodeRef, transform, transition } = useSortable({ id: topic.id });
+  const style = { transform: CSS.Transform.toString(transform), transition };
+
+  return (
+    <div ref={setNodeRef} style={style} {...attributes} {...listeners}>
+      <div
+        onClick={() => onSelect(topic.id)}
+        className={`p-4 rounded-2xl border transition-all cursor-pointer relative mb-3 ${selectedTopicId === topic.id ? 'border-indigo-500 bg-indigo-50/50 dark:bg-indigo-900/30' : 'border-slate-100 dark:border-slate-800 bg-white dark:bg-slate-900 hover:border-indigo-300'}`}
+      >
+        {isReviewDue(topic) && (
+          <div className="absolute -top-1 -right-1 flex h-3 w-3">
+            <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-amber-400 opacity-75"></span>
+            <span className="relative inline-flex rounded-full h-3 w-3 bg-amber-500"></span>
+          </div>
+        )}
+        <div className="flex justify-between items-start">
+          <div className="flex-1 min-w-0 pr-4">
+            <h4 className="font-bold text-slate-800 dark:text-slate-100 truncate flex items-center gap-2">
+              <span className="text-slate-300 cursor-grab">⋮⋮</span>
+              {topic.title}
+            </h4>
+            <div className="flex items-center gap-2 mt-1">
+              <span className={`text-[9px] font-black uppercase px-2 py-0.5 rounded-full ${topic.reviewLevel > 3 ? 'bg-emerald-100 text-emerald-600' : 'bg-slate-100 text-slate-500'}`}>Nivel {topic.reviewLevel}</span>
+              <span className="text-[9px] font-bold text-slate-400">{Math.floor(topic.timeSpent / 60)}m</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+};
+
+
 const AreaView: React.FC<AreaViewProps> = ({ area, onUpdateArea, onDeleteArea }) => {
+  const { reorderTopics } = useStudyStore();
   const [loadingPlan, setLoadingPlan] = useState(false);
   const [selectedTopicId, setSelectedTopicId] = useState<string | null>(null);
   const [aiResponse, setAiResponse] = useState<string | null>(null);
@@ -25,6 +64,20 @@ const AreaView: React.FC<AreaViewProps> = ({ area, onUpdateArea, onDeleteArea })
   const [isQuizMode, setIsQuizMode] = useState(false);
   const [quizQuestions, setQuizQuestions] = useState<QuizQuestion[]>([]);
   const [loadingQuiz, setLoadingQuiz] = useState(false);
+
+  const sensors = useSensors(
+    useSensor(PointerSensor),
+    useSensor(KeyboardSensor, { coordinateGetter: sortableKeyboardCoordinates })
+  );
+
+  const handleDragEnd = (event: DragEndEvent) => {
+    const { active, over } = event;
+    if (active.id !== over?.id) {
+      const oldIndex = area.topics.findIndex((t) => t.id === active.id);
+      const newIndex = area.topics.findIndex((t) => t.id === over?.id);
+      reorderTopics(area.id, oldIndex, newIndex);
+    }
+  };
 
   // Local state for topic editing
   const [editTopicTitle, setEditTopicTitle] = useState('');
@@ -47,7 +100,7 @@ const AreaView: React.FC<AreaViewProps> = ({ area, onUpdateArea, onDeleteArea })
 
   const handleSaveTopic = () => {
     if (!selectedTopicId) return;
-    const updatedTopics = area.topics.map(t => 
+    const updatedTopics = area.topics.map(t =>
       t.id === selectedTopicId ? { ...t, title: editTopicTitle, description: editTopicDesc, notes: editTopicNotes, resources: topicResources } : t
     );
     onUpdateArea({ ...area, topics: updatedTopics });
@@ -56,14 +109,14 @@ const AreaView: React.FC<AreaViewProps> = ({ area, onUpdateArea, onDeleteArea })
 
   const updateTimeSpent = (seconds: number) => {
     if (!selectedTopicId) return;
-    const updatedTopics = area.topics.map(t => 
+    const updatedTopics = area.topics.map(t =>
       t.id === selectedTopicId ? { ...t, timeSpent: (t.timeSpent || 0) + seconds } : t
     );
     onUpdateArea({ ...area, topics: updatedTopics });
   };
 
   const moveTopic = (topicId: string, newStatus: StudyStatus) => {
-    const updatedTopics = area.topics.map(t => 
+    const updatedTopics = area.topics.map(t =>
       t.id === topicId ? { ...t, status: newStatus } : t
     );
     onUpdateArea({ ...area, topics: updatedTopics });
@@ -76,9 +129,9 @@ const AreaView: React.FC<AreaViewProps> = ({ area, onUpdateArea, onDeleteArea })
         const intervals = [1, 3, 7, 14, 30, 60, 120]; // Days
         const nextReview = new Date();
         nextReview.setDate(nextReview.getDate() + intervals[nextLevel]);
-        return { 
-          ...t, 
-          reviewLevel: nextLevel, 
+        return {
+          ...t,
+          reviewLevel: nextLevel,
           nextReviewAt: nextReview.toISOString(),
           lastStudied: new Date().toISOString()
         };
@@ -164,10 +217,10 @@ const AreaView: React.FC<AreaViewProps> = ({ area, onUpdateArea, onDeleteArea })
     const url = prompt("URL:");
     const description = prompt("Breve descripción (opcional):") || "";
     if (!title || !url) return;
-    
+
     const isYoutube = url.includes('youtube.com') || url.includes('youtu.be');
     let type: ResourceType = isYoutube ? 'video' : 'link';
-    
+
     if (!isYoutube) {
       const typeInput = prompt("Tipo (link, book, pdf, other):", "link") as ResourceType;
       type = ['link', 'book', 'pdf', 'other'].includes(typeInput) ? typeInput : 'link';
@@ -175,8 +228,8 @@ const AreaView: React.FC<AreaViewProps> = ({ area, onUpdateArea, onDeleteArea })
 
     const newResource: Resource = {
       id: Math.random().toString(36).substr(2, 9),
-      title, 
-      url, 
+      title,
+      url,
       description,
       type,
       watched: false,
@@ -200,7 +253,7 @@ const AreaView: React.FC<AreaViewProps> = ({ area, onUpdateArea, onDeleteArea })
     const newResources = [...topicResources];
     const targetIndex = direction === 'up' ? index - 1 : index + 1;
     if (targetIndex < 0 || targetIndex >= newResources.length) return;
-    
+
     [newResources[index], newResources[targetIndex]] = [newResources[targetIndex], newResources[index]];
     setTopicResources(newResources);
     setHasUnsavedChanges(true);
@@ -232,18 +285,18 @@ const AreaView: React.FC<AreaViewProps> = ({ area, onUpdateArea, onDeleteArea })
           <div>
             <h2 className="text-3xl font-black text-slate-800 dark:text-white">{area.name}</h2>
             <div className="flex flex-wrap items-center gap-2 mt-2">
-               <button 
+              <button
                 onClick={() => setViewMode('kanban')}
                 className={`text-[10px] font-black uppercase px-4 py-1.5 rounded-full transition-all tracking-widest ${viewMode === 'kanban' ? 'bg-indigo-600 text-white shadow-lg' : 'bg-slate-200 dark:bg-slate-800 text-slate-500'}`}
-               >Tablero</button>
-               <button 
+              >Tablero</button>
+              <button
                 onClick={() => setViewMode('detail')}
                 className={`text-[10px] font-black uppercase px-4 py-1.5 rounded-full transition-all tracking-widest ${viewMode === 'detail' ? 'bg-indigo-600 text-white shadow-lg' : 'bg-slate-200 dark:bg-slate-800 text-slate-500'}`}
-               >Feynman & Detalle</button>
-               <button 
+              >Feynman & Detalle</button>
+              <button
                 onClick={() => setViewMode('tree')}
                 className={`text-[10px] font-black uppercase px-4 py-1.5 rounded-full transition-all tracking-widest ${viewMode === 'tree' ? 'bg-indigo-600 text-white shadow-lg' : 'bg-slate-200 dark:bg-slate-800 text-slate-500'}`}
-               >Árbol de Habilidades</button>
+              >Árbol de Habilidades</button>
             </div>
           </div>
         </div>
@@ -258,56 +311,46 @@ const AreaView: React.FC<AreaViewProps> = ({ area, onUpdateArea, onDeleteArea })
       </header>
 
       {viewMode === 'kanban' && (
-        <KanbanBoard 
-          topics={area.topics} 
-          onMoveTopic={moveTopic} 
-          onSelectTopic={(id) => { setSelectedTopicId(id); setViewMode('detail'); }} 
+        <KanbanBoard
+          topics={area.topics}
+          onMoveTopic={moveTopic}
+          onSelectTopic={(id) => { setSelectedTopicId(id); setViewMode('detail'); }}
         />
       )}
 
       {viewMode === 'tree' && (
-        <SkillTree 
-          topics={area.topics} 
-          onSelectTopic={(id) => { setSelectedTopicId(id); setViewMode('detail'); }} 
+        <SkillTree
+          topics={area.topics}
+          onSelectTopic={(id) => { setSelectedTopicId(id); setViewMode('detail'); }}
         />
       )}
 
       {viewMode === 'detail' && (
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
           <div className="lg:col-span-1 space-y-3 max-h-[70vh] overflow-y-auto pr-1 custom-scrollbar">
-            {area.topics.map(topic => (
-              <div 
-                key={topic.id}
-                onClick={() => setSelectedTopicId(topic.id)}
-                className={`p-4 rounded-2xl border transition-all cursor-pointer relative ${selectedTopicId === topic.id ? 'border-indigo-500 bg-indigo-50/50 dark:bg-indigo-900/30' : 'border-slate-100 dark:border-slate-800 bg-white dark:bg-slate-900 hover:border-indigo-300'}`}
-              >
-                {isReviewDue(topic) && (
-                  <div className="absolute -top-1 -right-1 flex h-3 w-3">
-                    <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-amber-400 opacity-75"></span>
-                    <span className="relative inline-flex rounded-full h-3 w-3 bg-amber-500"></span>
-                  </div>
-                )}
-                <div className="flex justify-between items-start">
-                  <div className="flex-1 min-w-0 pr-4">
-                    <h4 className="font-bold text-slate-800 dark:text-slate-100 truncate">{topic.title}</h4>
-                    <div className="flex items-center gap-2 mt-1">
-                       <span className={`text-[9px] font-black uppercase px-2 py-0.5 rounded-full ${topic.reviewLevel > 3 ? 'bg-emerald-100 text-emerald-600' : 'bg-slate-100 text-slate-500'}`}>Nivel {topic.reviewLevel}</span>
-                       <span className="text-[9px] font-bold text-slate-400">{Math.floor(topic.timeSpent / 60)}m</span>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            ))}
+            <DndContext sensors={sensors} collisionDetection={closestCenter} onDragEnd={handleDragEnd}>
+              <SortableContext items={area.topics.map(t => t.id)} strategy={verticalListSortingStrategy}>
+                {area.topics.map(topic => (
+                  <SortableTopicItem
+                    key={topic.id}
+                    topic={topic}
+                    selectedTopicId={selectedTopicId}
+                    onSelect={setSelectedTopicId}
+                    isReviewDue={isReviewDue}
+                  />
+                ))}
+              </SortableContext>
+            </DndContext>
           </div>
 
           <div className="lg:col-span-2">
             {selectedTopic ? (
               <div className="bg-white dark:bg-slate-900 p-8 rounded-3xl shadow-sm border border-slate-100 dark:border-slate-800 min-h-[700px] flex flex-col relative animate-fade-in">
-                
+
                 <div className="flex flex-col md:flex-row justify-between items-start border-b border-slate-100 dark:border-slate-800 pb-6 mb-8 gap-4">
                   <div className="flex-1 w-full">
                     <div className="flex items-center gap-2 mb-1">
-                      <input 
+                      <input
                         type="text"
                         value={editTopicTitle}
                         onChange={(e) => { setEditTopicTitle(e.target.value); setHasUnsavedChanges(true); }}
@@ -326,8 +369,8 @@ const AreaView: React.FC<AreaViewProps> = ({ area, onUpdateArea, onDeleteArea })
                     </div>
                   </div>
                   <div className="flex gap-2">
-                    <button 
-                      onClick={startQuiz} 
+                    <button
+                      onClick={startQuiz}
                       disabled={loadingQuiz}
                       className="px-4 py-2.5 bg-amber-100 dark:bg-amber-900/30 text-amber-700 dark:text-amber-300 rounded-xl border border-amber-200 dark:border-amber-800 flex items-center gap-2 font-bold transition-all hover:scale-105 text-sm"
                     >
@@ -358,13 +401,13 @@ const AreaView: React.FC<AreaViewProps> = ({ area, onUpdateArea, onDeleteArea })
                       </div>
                     </div>
                     <div className="flex gap-2 w-full md:w-auto">
-                      <button 
+                      <button
                         onClick={() => handleCompleteReview(selectedTopic.id, true)}
                         className="flex-1 md:flex-none px-4 py-2 bg-emerald-500 text-white rounded-xl text-xs font-bold hover:bg-emerald-600 transition-all"
                       >
                         Repaso Exitoso
                       </button>
-                      <button 
+                      <button
                         onClick={() => handleCompleteReview(selectedTopic.id, false)}
                         className="flex-1 md:flex-none px-4 py-2 bg-slate-200 dark:bg-slate-700 text-slate-600 dark:text-slate-300 rounded-xl text-xs font-bold hover:bg-slate-300 transition-all"
                       >
@@ -382,7 +425,7 @@ const AreaView: React.FC<AreaViewProps> = ({ area, onUpdateArea, onDeleteArea })
                       </label>
                       <button onClick={() => handleAskAI(editTopicTitle)} disabled={loadingAI} className="text-[10px] font-black uppercase text-indigo-500 hover:underline">Consultar Tutor IA</button>
                     </div>
-                    <textarea 
+                    <textarea
                       className="w-full h-64 p-6 rounded-3xl bg-slate-50 dark:bg-slate-800 border-none focus:ring-2 focus:ring-indigo-500 dark:text-slate-200 text-lg leading-relaxed transition-all placeholder:text-slate-300"
                       placeholder="Explica el concepto como si se lo enseñaras a un niño..."
                       value={editTopicNotes}
@@ -406,7 +449,7 @@ const AreaView: React.FC<AreaViewProps> = ({ area, onUpdateArea, onDeleteArea })
                           <div className="flex flex-col md:flex-row gap-5">
                             {/* Reordering and Category Icon */}
                             <div className="flex flex-row md:flex-col items-center justify-center gap-2 border-r border-slate-200 dark:border-slate-700 pr-4">
-                              <button 
+                              <button
                                 onClick={() => moveResource(index, 'up')}
                                 disabled={index === 0}
                                 className="p-1.5 rounded-lg hover:bg-white dark:hover:bg-slate-800 disabled:opacity-20 text-slate-400"
@@ -416,7 +459,7 @@ const AreaView: React.FC<AreaViewProps> = ({ area, onUpdateArea, onDeleteArea })
                               <div className="w-10 h-10 bg-white dark:bg-slate-900 rounded-xl flex items-center justify-center text-xl shadow-sm">
                                 {getResourceIcon(res.type)}
                               </div>
-                              <button 
+                              <button
                                 onClick={() => moveResource(index, 'down')}
                                 disabled={index === topicResources.length - 1}
                                 className="p-1.5 rounded-lg hover:bg-white dark:hover:bg-slate-800 disabled:opacity-20 text-slate-400"
@@ -428,7 +471,7 @@ const AreaView: React.FC<AreaViewProps> = ({ area, onUpdateArea, onDeleteArea })
                             <div className="flex-1 min-w-0">
                               <div className="flex items-center gap-3 mb-2">
                                 {res.type === 'video' && (
-                                  <button 
+                                  <button
                                     onClick={() => updateResource(res.id, { watched: !res.watched })}
                                     className={`w-5 h-5 rounded-md border-2 flex-shrink-0 flex items-center justify-center transition-all ${res.watched ? 'bg-emerald-500 border-emerald-500 text-white' : 'border-slate-300 dark:border-slate-600 text-transparent'}`}
                                   >
@@ -442,13 +485,13 @@ const AreaView: React.FC<AreaViewProps> = ({ area, onUpdateArea, onDeleteArea })
                                   <span className="text-[10px] font-black uppercase text-indigo-500 tracking-widest">{res.type}</span>
                                 </div>
                               </div>
-                              
+
                               {res.description && (
                                 <p className="text-xs text-slate-500 dark:text-slate-400 italic mb-3 px-1">{res.description}</p>
                               )}
 
                               {res.type === 'video' && (
-                                <textarea 
+                                <textarea
                                   placeholder="Notas del video..."
                                   className="w-full bg-white dark:bg-slate-900/50 p-3 rounded-2xl border-none focus:ring-1 focus:ring-rose-500 text-xs h-20 resize-none dark:text-slate-300"
                                   value={res.videoNotes || ''}
@@ -458,8 +501,8 @@ const AreaView: React.FC<AreaViewProps> = ({ area, onUpdateArea, onDeleteArea })
                             </div>
 
                             <div className="flex md:flex-col gap-2 justify-center pl-4 border-l border-slate-200 dark:border-slate-700">
-                              <button 
-                                onClick={() => removeResource(res.id)} 
+                              <button
+                                onClick={() => removeResource(res.id)}
                                 className="p-2 text-rose-500 hover:bg-rose-100 dark:hover:bg-rose-900/30 rounded-xl transition-all"
                               >
                                 <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" /></svg>
@@ -498,8 +541,8 @@ const AreaView: React.FC<AreaViewProps> = ({ area, onUpdateArea, onDeleteArea })
       {/* Quiz Overlay */}
       {isQuizMode && (
         <div className="fixed inset-0 bg-slate-900/80 backdrop-blur-sm flex items-center justify-center z-[100] p-4">
-          <QuizModule 
-            questions={quizQuestions} 
+          <QuizModule
+            questions={quizQuestions}
             onCancel={() => setIsQuizMode(false)}
             onComplete={(score) => {
               setIsQuizMode(false);
@@ -519,14 +562,14 @@ const AreaView: React.FC<AreaViewProps> = ({ area, onUpdateArea, onDeleteArea })
           <div className="bg-white dark:bg-slate-900 rounded-3xl p-8 max-w-md w-full animate-scale-in border border-slate-100 dark:border-slate-800 shadow-2xl">
             <h3 className="text-2xl font-black mb-6 text-slate-800 dark:text-white">Nuevo Subtema</h3>
             <div className="space-y-4">
-              <input 
-                type="text" autoFocus placeholder="Título" 
+              <input
+                type="text" autoFocus placeholder="Título"
                 className="w-full px-5 py-4 rounded-2xl bg-slate-50 dark:bg-slate-800 border-none focus:ring-2 focus:ring-indigo-500 font-bold dark:text-white"
-                value={newTopicData.title} onChange={e => setNewTopicData({...newTopicData, title: e.target.value})}
+                value={newTopicData.title} onChange={e => setNewTopicData({ ...newTopicData, title: e.target.value })}
               />
-              <textarea 
+              <textarea
                 placeholder="Resumen rápido..." className="w-full px-5 py-4 rounded-2xl bg-slate-50 dark:bg-slate-800 border-none focus:ring-2 focus:ring-indigo-500 h-24 dark:text-white"
-                value={newTopicData.description} onChange={e => setNewTopicData({...newTopicData, description: e.target.value})}
+                value={newTopicData.description} onChange={e => setNewTopicData({ ...newTopicData, description: e.target.value })}
               />
               <div className="flex gap-4 pt-4">
                 <button onClick={() => setIsAddingTopic(false)} className="flex-1 py-4 bg-slate-100 dark:bg-slate-800 rounded-2xl font-bold dark:text-slate-400">Cancelar</button>

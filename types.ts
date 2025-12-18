@@ -29,6 +29,7 @@ export interface Topic {
   lastStudied?: string;
   reviewLevel: number; // 0 to 6
   nextReviewAt?: string; // ISO string
+  orderIndex?: number;
 }
 
 export interface StudyLog {
@@ -43,6 +44,7 @@ export interface StudyArea {
   icon: string;
   topics: Topic[];
   createdAt: string;
+  orderIndex?: number;
 }
 
 export interface StudyPlanResponse {

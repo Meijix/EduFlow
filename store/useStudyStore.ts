@@ -10,7 +10,7 @@ interface StudyState {
   activeAreaId: string | null;
   isDarkMode: boolean;
   isLoading: boolean;
-  
+
   // Actions
   init: () => Promise<void>;
   toggleDarkMode: () => void;
@@ -19,6 +19,8 @@ interface StudyState {
   updateArea: (updatedArea: StudyArea) => Promise<void>;
   deleteArea: (id: string) => Promise<void>;
   logActivity: () => void;
+  reorderAreas: (oldIndex: number, newIndex: number) => void;
+  reorderTopics: (areaId: string, oldIndex: number, newIndex: number) => void;
 }
 
 export const useStudyStore = create<StudyState>()(
@@ -35,20 +37,20 @@ export const useStudyStore = create<StudyState>()(
         try {
           const fetchedAreas = await dbService.fetchAreas();
           const fetchedLogs = await dbService.fetchLogs();
-          
+
           // Theme initialization logic
           const savedTheme = localStorage.getItem('edustream_theme');
           const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
           const isDark = savedTheme === 'dark' || (!savedTheme && prefersDark);
-          
+
           if (isDark) document.documentElement.classList.add('dark');
           else document.documentElement.classList.remove('dark');
 
-          set({ 
-            areas: fetchedAreas.length > 0 ? fetchedAreas : get().areas, 
+          set({
+            areas: fetchedAreas.length > 0 ? fetchedAreas : get().areas,
             studyLogs: fetchedLogs.length > 0 ? fetchedLogs : get().studyLogs,
             isDarkMode: isDark,
-            isLoading: false 
+            isLoading: false
           });
         } catch (e) {
           console.error("Error initializing store", e);
@@ -79,11 +81,11 @@ export const useStudyStore = create<StudyState>()(
           createdAt: new Date().toISOString()
         };
 
-        set((state) => ({ 
+        set((state) => ({
           areas: [...state.areas, newArea],
-          activeAreaId: newArea.id 
+          activeAreaId: newArea.id
         }));
-        
+
         await dbService.saveArea(newArea);
       },
 
@@ -115,6 +117,36 @@ export const useStudyStore = create<StudyState>()(
           return {
             studyLogs: [...state.studyLogs, { date: today, count: 1 }]
           };
+        });
+      },
+
+      reorderAreas: (oldIndex, newIndex) => {
+        set((state) => {
+          const newAreas = [...state.areas];
+          const [movedArea] = newAreas.splice(oldIndex, 1);
+          newAreas.splice(newIndex, 0, movedArea);
+          dbService.saveAllAreas(newAreas).catch(console.error); // Fire and forget save
+          return { areas: newAreas };
+        });
+      },
+
+      reorderTopics: (areaId, oldIndex, newIndex) => {
+        set((state) => {
+          const areaIndex = state.areas.findIndex(a => a.id === areaId);
+          if (areaIndex === -1) return {};
+
+          const area = state.areas[areaIndex];
+          const newTopics = [...area.topics];
+          const [movedTopic] = newTopics.splice(oldIndex, 1);
+          newTopics.splice(newIndex, 0, movedTopic);
+
+          const updatedArea = { ...area, topics: newTopics };
+          const newAreas = [...state.areas];
+          newAreas[areaIndex] = updatedArea;
+
+          dbService.saveArea(updatedArea).catch(console.error);
+
+          return { areas: newAreas };
         });
       }
     }),

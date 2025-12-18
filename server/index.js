@@ -16,15 +16,21 @@ initDB();
 // 1. GET /api/areas - Get all study areas with topics
 app.get('/api/areas', (req, res) => {
     try {
-        const areas = db.prepare('SELECT * FROM study_areas ORDER BY created_at DESC').all();
+        const areas = db.prepare('SELECT * FROM study_areas ORDER BY order_index ASC, created_at DESC').all(); // Sorted by order
         const result = areas.map(area => {
-            const topics = db.prepare('SELECT * FROM topics WHERE area_id = ?').all(area.id);
+            const topics = db.prepare('SELECT * FROM topics WHERE area_id = ? ORDER BY order_index ASC').all(area.id); // Sorted by order
             const topicsWithResources = topics.map(topic => {
                 const resources = db.prepare('SELECT * FROM resources WHERE topic_id = ?').all(topic.id);
-                const mappedResources = resources.map(r => ({ ...r, videoNotes: r.video_notes })); // snake_case fix
-                return { ...topic, resources: mappedResources, timeSpent: topic.time_spent, reviewLevel: topic.review_level }; // snake_case fix
+                const mappedResources = resources.map(r => ({ ...r, videoNotes: r.video_notes }));
+                return {
+                    ...topic,
+                    resources: mappedResources,
+                    timeSpent: topic.time_spent,
+                    reviewLevel: topic.review_level,
+                    orderIndex: topic.order_index // CamelCase
+                };
             });
-            return { ...area, topics: topicsWithResources };
+            return { ...area, topics: topicsWithResources, orderIndex: area.order_index }; // CamelCase
         });
         res.json(result);
     } catch (err) {
@@ -35,18 +41,18 @@ app.get('/api/areas', (req, res) => {
 
 // 2. PUT /api/areas - Upsert study area with cascade (Deep Save)
 app.put('/api/areas', (req, res) => {
-    const { id, name, description, icon, createdAt, topics } = req.body;
+    const { id, name, description, icon, createdAt, topics, orderIndex } = req.body;
 
-    const insertArea = db.prepare('INSERT OR REPLACE INTO study_areas (id, name, description, icon, created_at) VALUES (?, ?, ?, ?, ?)');
+    const insertArea = db.prepare('INSERT OR REPLACE INTO study_areas (id, name, description, icon, created_at, order_index) VALUES (?, ?, ?, ?, ?, ?)');
     const deleteTopics = db.prepare('DELETE FROM topics WHERE area_id = ?');
-    const insertTopic = db.prepare('INSERT INTO topics (id, area_id, title, description, status, notes, time_spent, last_studied, review_level, next_review_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)');
+    const insertTopic = db.prepare('INSERT INTO topics (id, area_id, title, description, status, notes, time_spent, last_studied, review_level, next_review_at, order_index) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)');
     const insertResource = db.prepare('INSERT INTO resources (id, topic_id, type, title, url, description, watched, video_notes) VALUES (?, ?, ?, ?, ?, ?, ?, ?)');
 
     const transaction = db.transaction(() => {
         // 1. Upsert Area
-        insertArea.run(id, name, description, icon, createdAt);
+        insertArea.run(id, name, description, icon, createdAt, orderIndex || 0);
 
-        // 2. Replace Topics (easier than diffing)
+        // 2. Replace Topics
         deleteTopics.run(id); // Cascade delete triggers resources deletion too? Explicit check needed if foreign keys enabled not by default in better-sqlite3? 
         // better-sqlite3 enables FKs if you tell it to. I didn't verify PRAGMA foreign_keys = ON.
         // To be safe, let's assume cascade might not work if not enabled. 
@@ -62,11 +68,13 @@ app.put('/api/areas', (req, res) => {
         // I'll just run PRAGMA foreign_keys = ON; in db connection.
 
         if (topics && topics.length > 0) {
-            for (const topic of topics) {
+            for (let i = 0; i < topics.length; i++) {
+                const topic = topics[i];
                 insertTopic.run(
                     topic.id, id, topic.title, topic.description, topic.status,
                     topic.notes || '', topic.timeSpent || 0, topic.lastStudied || null,
-                    topic.reviewLevel || 0, topic.nextReviewAt || null
+                    topic.reviewLevel || 0, topic.nextReviewAt || null,
+                    topic.orderIndex !== undefined ? topic.orderIndex : i // Use existing or index
                 );
 
                 if (topic.resources && topic.resources.length > 0) {

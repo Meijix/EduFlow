@@ -4,7 +4,8 @@ CREATE TABLE IF NOT EXISTS study_areas (
   name TEXT NOT NULL,
   description TEXT,
   icon TEXT,
-  created_at DATETIME DEFAULT CURRENT_TIMESTAMP
+  created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+  order_index INTEGER DEFAULT 0
 );
 
 CREATE TABLE IF NOT EXISTS topics (
@@ -18,6 +19,7 @@ CREATE TABLE IF NOT EXISTS topics (
   last_studied DATETIME,
   review_level INTEGER DEFAULT 0,
   next_review_at DATETIME,
+  order_index INTEGER DEFAULT 0,
   FOREIGN KEY(area_id) REFERENCES study_areas(id) ON DELETE CASCADE
 );
 

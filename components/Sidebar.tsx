@@ -1,13 +1,61 @@
 
 import React from 'react';
 import { useStudyStore } from '../store/useStudyStore';
+import { DndContext, closestCenter, KeyboardSensor, PointerSensor, useSensor, useSensors, DragEndEvent } from '@dnd-kit/core';
+import { arrayMove, SortableContext, sortableKeyboardCoordinates, verticalListSortingStrategy, useSortable } from '@dnd-kit/sortable';
+import { CSS } from '@dnd-kit/utilities';
+import { StudyArea } from '../types';
 
 interface SidebarProps {
   onAddArea: () => void;
 }
 
+const SortableAreaItem: React.FC<{ area: StudyArea, isActive: boolean, onClick: () => void }> = ({ area, isActive, onClick }) => {
+  const {
+    attributes,
+    listeners,
+    setNodeRef,
+    transform,
+    transition,
+  } = useSortable({ id: area.id });
+
+  const style = {
+    transform: CSS.Transform.toString(transform),
+    transition,
+  };
+
+  return (
+    <div ref={setNodeRef} style={style} {...attributes} {...listeners}>
+      <button
+        onClick={onClick}
+        className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl transition-all text-left ${isActive ? 'bg-indigo-50 dark:bg-indigo-900/40 text-indigo-700 dark:text-indigo-300 font-semibold ring-1 ring-indigo-200 dark:ring-indigo-800' : 'text-slate-600 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-800'}`}
+      >
+        <span className="text-xl bg-white dark:bg-slate-800 w-10 h-10 flex items-center justify-center rounded-lg shadow-sm">{area.icon || '📚'}</span>
+        <span className="truncate flex-1">{area.name}</span>
+        <span className="text-slate-300 dark:text-slate-600 cursor-grab px-2">⋮⋮</span>
+      </button>
+    </div>
+  );
+};
+
 const Sidebar: React.FC<SidebarProps> = ({ onAddArea }) => {
-  const { areas, activeAreaId, setActiveAreaId, isDarkMode, toggleDarkMode } = useStudyStore();
+  const { areas, activeAreaId, setActiveAreaId, isDarkMode, toggleDarkMode, reorderAreas } = useStudyStore();
+
+  const sensors = useSensors(
+    useSensor(PointerSensor),
+    useSensor(KeyboardSensor, {
+      coordinateGetter: sortableKeyboardCoordinates,
+    })
+  );
+
+  const handleDragEnd = (event: DragEndEvent) => {
+    const { active, over } = event;
+    if (active.id !== over?.id) {
+      const oldIndex = areas.findIndex((a) => a.id === active.id);
+      const newIndex = areas.findIndex((a) => a.id === over?.id);
+      reorderAreas(oldIndex, newIndex);
+    }
+  };
 
   return (
     <aside className="w-72 bg-white dark:bg-slate-900 border-r border-slate-200 dark:border-slate-800 h-screen sticky top-0 flex flex-col transition-colors duration-300">
@@ -18,7 +66,7 @@ const Sidebar: React.FC<SidebarProps> = ({ onAddArea }) => {
           </svg>
           EduStream
         </h1>
-        <button 
+        <button
           onClick={toggleDarkMode}
           className="p-2 rounded-lg bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 hover:ring-2 hover:ring-indigo-300 transition-all"
           title="Alternar Modo Oscuro"
@@ -46,16 +94,25 @@ const Sidebar: React.FC<SidebarProps> = ({ onAddArea }) => {
           Mis Áreas de Estudio
         </div>
 
-        {areas.map((area) => (
-          <button
-            key={area.id}
-            onClick={() => setActiveAreaId(area.id)}
-            className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl transition-all text-left ${activeAreaId === area.id ? 'bg-indigo-50 dark:bg-indigo-900/40 text-indigo-700 dark:text-indigo-300 font-semibold ring-1 ring-indigo-200 dark:ring-indigo-800' : 'text-slate-600 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-800'}`}
+        <DndContext
+          sensors={sensors}
+          collisionDetection={closestCenter}
+          onDragEnd={handleDragEnd}
+        >
+          <SortableContext
+            items={areas.map(a => a.id)}
+            strategy={verticalListSortingStrategy}
           >
-            <span className="text-xl bg-white dark:bg-slate-800 w-10 h-10 flex items-center justify-center rounded-lg shadow-sm">{area.icon || '📚'}</span>
-            <span className="truncate flex-1">{area.name}</span>
-          </button>
-        ))}
+            {areas.map((area) => (
+              <SortableAreaItem
+                key={area.id}
+                area={area}
+                isActive={activeAreaId === area.id}
+                onClick={() => setActiveAreaId(area.id)}
+              />
+            ))}
+          </SortableContext>
+        </DndContext>
       </nav>
 
       <div className="p-4 border-t border-slate-100 dark:border-slate-800">

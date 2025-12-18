@@ -26,6 +26,13 @@ export const dbService = {
     if (!res.ok) throw new Error('Failed to save area');
   },
 
+  async saveAllAreas(areas: StudyArea[]): Promise<void> {
+    // In a real app, this should be a bulk API call.
+    // Here we just loop for simplicity, or we could add a bulk endpoint.
+    // Given the small number of areas, parallel requests are fine.
+    await Promise.all(areas.map(area => this.saveArea(area)));
+  },
+
   async deleteArea(id: string): Promise<void> {
     const res = await fetch(`${API_ENDPOINT}/areas/${id}`, { method: 'DELETE' });
     if (!res.ok) throw new Error('Failed to delete area');

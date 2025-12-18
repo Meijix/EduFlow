@@ -119,19 +119,19 @@ const GlobalTimer: React.FC = () => {
     // User wants it visible. Let's show "No Topic Selected" if null.
 
     return (
-        <div className={`fixed top-6 right-6 z-[100] transition-all duration-300 ${isMinimized ? 'w-auto' : 'w-72'}`}>
-            <div className="bg-slate-900/90 backdrop-blur-md text-white rounded-3xl shadow-2xl border border-slate-700/50 overflow-hidden">
+        <div className={`fixed top-6 right-6 z-[100] transition-all duration-300 ${isMinimized ? 'w-auto' : 'w-80'}`}>
+            <div className="bg-[#161B22] text-white rounded-3xl shadow-2xl shadow-black/50 border border-[#30363d] overflow-hidden">
                 {/* Header / Draggable Area */}
-                <div className="bg-slate-800/50 p-3 flex justify-between items-center cursor-move" title="Timer Global">
+                <div className="bg-[#0F1115] p-3 flex justify-between items-center cursor-move border-b border-[#30363d]" title="Timer Global">
                     <div className="flex items-center gap-2 overflow-hidden">
                         <span className="text-xl">{mode === 'work' ? '🍅' : '☕'}</span>
                         {!isMinimized && (
-                            <span className="text-xs font-bold truncate text-slate-300">
+                            <span className="text-xs font-bold truncate text-lime-400">
                                 {activeTopic ? activeTopic.title : "Selecciona un tema..."}
                             </span>
                         )}
                     </div>
-                    <button onClick={() => setIsMinimized(!isMinimized)} className="text-slate-400 hover:text-white transition-colors">
+                    <button onClick={() => setIsMinimized(!isMinimized)} className="text-slate-500 hover:text-white transition-colors">
                         {isMinimized ? '↗' : '—'}
                     </button>
                 </div>
@@ -139,14 +139,14 @@ const GlobalTimer: React.FC = () => {
                 {/* Timer Body */}
                 {!isMinimized && (
                     <div className="p-6 flex flex-col items-center gap-4">
-                        <div className="text-5xl font-mono font-black tabular-nums tracking-tighter text-transparent bg-clip-text bg-gradient-to-br from-white to-slate-400">
+                        <div className="text-6xl font-mono font-black tabular-nums tracking-tighter text-white">
                             {formatTime(seconds)}
                         </div>
 
                         <div className="flex gap-2 w-full">
                             <button
                                 onClick={toggleTimer}
-                                className={`flex-1 py-3 rounded-xl font-bold transition-all shadow-lg ${isActive ? 'bg-red-500 hover:bg-red-600 shadow-red-500/20' : 'bg-emerald-500 hover:bg-emerald-600 shadow-emerald-500/20'}`}
+                                className={`flex-1 py-4 rounded-2xl font-black text-lg transition-all shadow-lg ${isActive ? 'bg-red-500 text-white hover:bg-red-600' : 'bg-lime-400 text-black hover:bg-lime-300 shadow-lime-400/20'}`}
                             >
                                 {isActive ? 'Pausar' : 'Iniciar'}
                             </button>
@@ -155,13 +155,13 @@ const GlobalTimer: React.FC = () => {
                         <div className="flex gap-2 w-full">
                             <button
                                 onClick={() => resetTimer('work')}
-                                className={`flex-1 p-2 rounded-lg text-xs font-bold transition-all ${mode === 'work' ? 'bg-slate-700 text-white' : 'bg-slate-800 text-slate-500 hover:bg-slate-700'}`}
+                                className={`flex-1 p-2 rounded-xl text-xs font-bold transition-all ${mode === 'work' ? 'bg-[#30363d] text-white border border-slate-600' : 'bg-[#0F1115] text-slate-500 hover:bg-[#30363d]'}`}
                             >
                                 Pomodoro
                             </button>
                             <button
                                 onClick={() => resetTimer('break')}
-                                className={`flex-1 p-2 rounded-lg text-xs font-bold transition-all ${mode === 'break' ? 'bg-slate-700 text-white' : 'bg-slate-800 text-slate-500 hover:bg-slate-700'}`}
+                                className={`flex-1 p-2 rounded-xl text-xs font-bold transition-all ${mode === 'break' ? 'bg-[#30363d] text-white border border-slate-600' : 'bg-[#0F1115] text-slate-500 hover:bg-[#30363d]'}`}
                             >
                                 Descanso
                             </button>

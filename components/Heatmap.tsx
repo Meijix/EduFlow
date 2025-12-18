@@ -18,10 +18,10 @@ const Heatmap: React.FC<HeatmapProps> = ({ logs }) => {
 
   const getColor = (count: number) => {
     if (count === 0) return 'bg-slate-100 dark:bg-slate-800';
-    if (count < 10) return 'bg-indigo-200 dark:bg-indigo-900/40';
-    if (count < 30) return 'bg-indigo-400 dark:bg-indigo-700';
-    if (count < 60) return 'bg-indigo-600 dark:bg-indigo-500';
-    return 'bg-indigo-800 dark:bg-indigo-400';
+    if (count < 10) return 'bg-blue-200 dark:bg-blue-900/40';
+    if (count < 30) return 'bg-blue-400 dark:bg-blue-700';
+    if (count < 60) return 'bg-blue-600 dark:bg-blue-500';
+    return 'bg-blue-800 dark:bg-blue-400';
   };
 
   return (
@@ -31,9 +31,9 @@ const Heatmap: React.FC<HeatmapProps> = ({ logs }) => {
         <div className="flex items-center gap-1 text-[10px] text-slate-400 font-bold">
           <span>Menos</span>
           <div className="w-2 h-2 rounded-sm bg-slate-100 dark:bg-slate-800"></div>
-          <div className="w-2 h-2 rounded-sm bg-indigo-200"></div>
-          <div className="w-2 h-2 rounded-sm bg-indigo-500"></div>
-          <div className="w-2 h-2 rounded-sm bg-indigo-800"></div>
+          <div className="w-2 h-2 rounded-sm bg-blue-200"></div>
+          <div className="w-2 h-2 rounded-sm bg-blue-500"></div>
+          <div className="w-2 h-2 rounded-sm bg-blue-800"></div>
           <span>Más</span>
         </div>
       </div>
@@ -41,7 +41,7 @@ const Heatmap: React.FC<HeatmapProps> = ({ logs }) => {
         {days.map((day, i) => (
           <div
             key={i}
-            className={`w-3 h-3 rounded-sm ${getColor(day.count)} transition-all hover:ring-2 hover:ring-indigo-300 cursor-help`}
+            className={`w-3 h-3 rounded-sm ${getColor(day.count)} transition-all hover:ring-2 hover:ring-blue-300 cursor-help`}
             title={`${day.date}: ${day.count} min estudiados`}
           ></div>
         ))}

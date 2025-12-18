@@ -25,7 +25,7 @@ const SortableTopicItem = ({ topic, selectedTopicId, onSelect, isReviewDue }: { 
     <div ref={setNodeRef} style={style} {...attributes} {...listeners}>
       <div
         onClick={() => onSelect(topic.id)}
-        className={`p-4 rounded-2xl border transition-all cursor-pointer relative mb-3 ${selectedTopicId === topic.id ? 'border-indigo-500 bg-indigo-50/50 dark:bg-indigo-900/30' : 'border-slate-100 dark:border-slate-800 bg-white dark:bg-slate-900 hover:border-indigo-300'}`}
+        className={`p-4 rounded-2xl border transition-all cursor-pointer relative mb-3 ${selectedTopicId === topic.id ? 'border-blue-500 bg-blue-50/50 dark:bg-blue-900/30' : 'border-slate-100 dark:border-slate-800 bg-white dark:bg-slate-900 hover:border-blue-300'}`}
       >
         {isReviewDue(topic) && (
           <div className="absolute -top-1 -right-1 flex h-3 w-3">
@@ -287,21 +287,21 @@ const AreaView: React.FC<AreaViewProps> = ({ area, onUpdateArea, onDeleteArea })
             <div className="flex flex-wrap items-center gap-2 mt-2">
               <button
                 onClick={() => setViewMode('kanban')}
-                className={`text-[10px] font-black uppercase px-4 py-1.5 rounded-full transition-all tracking-widest ${viewMode === 'kanban' ? 'bg-indigo-600 text-white shadow-lg' : 'bg-slate-200 dark:bg-slate-800 text-slate-500'}`}
+                className={`text-[10px] font-black uppercase px-4 py-1.5 rounded-full transition-all tracking-widest ${viewMode === 'kanban' ? 'bg-blue-600 text-white shadow-lg' : 'bg-slate-200 dark:bg-slate-800 text-slate-500'}`}
               >Tablero</button>
               <button
                 onClick={() => setViewMode('detail')}
-                className={`text-[10px] font-black uppercase px-4 py-1.5 rounded-full transition-all tracking-widest ${viewMode === 'detail' ? 'bg-indigo-600 text-white shadow-lg' : 'bg-slate-200 dark:bg-slate-800 text-slate-500'}`}
+                className={`text-[10px] font-black uppercase px-4 py-1.5 rounded-full transition-all tracking-widest ${viewMode === 'detail' ? 'bg-blue-600 text-white shadow-lg' : 'bg-slate-200 dark:bg-slate-800 text-slate-500'}`}
               >Feynman & Detalle</button>
               <button
                 onClick={() => setViewMode('tree')}
-                className={`text-[10px] font-black uppercase px-4 py-1.5 rounded-full transition-all tracking-widest ${viewMode === 'tree' ? 'bg-indigo-600 text-white shadow-lg' : 'bg-slate-200 dark:bg-slate-800 text-slate-500'}`}
+                className={`text-[10px] font-black uppercase px-4 py-1.5 rounded-full transition-all tracking-widest ${viewMode === 'tree' ? 'bg-blue-600 text-white shadow-lg' : 'bg-slate-200 dark:bg-slate-800 text-slate-500'}`}
               >Árbol de Habilidades</button>
             </div>
           </div>
         </div>
         <div className="flex gap-2">
-          <button onClick={handleGeneratePlan} disabled={loadingPlan} className="bg-indigo-600 dark:bg-indigo-500 text-white px-5 py-2.5 rounded-xl font-bold flex items-center gap-2 shadow-lg hover:scale-105 transition-all text-sm">
+          <button onClick={handleGeneratePlan} disabled={loadingPlan} className="bg-blue-600 dark:bg-blue-500 text-white px-5 py-2.5 rounded-xl font-bold flex items-center gap-2 shadow-lg hover:scale-105 transition-all text-sm">
             {loadingPlan ? '...' : 'Sugerencias IA'}
           </button>
           <button onClick={() => setIsAddingTopic(true)} className="bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 px-5 py-2.5 rounded-xl font-bold hover:bg-slate-200 transition-all text-sm">
@@ -362,7 +362,7 @@ const AreaView: React.FC<AreaViewProps> = ({ area, onUpdateArea, onDeleteArea })
                         <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
                         {Math.floor(selectedTopic.timeSpent / 3600)}h {Math.floor((selectedTopic.timeSpent % 3600) / 60)}m
                       </span>
-                      <button onClick={() => setShowTimer(!showTimer)} className="text-indigo-500 hover:text-indigo-600 flex items-center gap-1">
+                      <button onClick={() => setShowTimer(!showTimer)} className="text-blue-500 hover:text-blue-600 flex items-center gap-1">
                         <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M13 10V3L4 14h7v7l9-11h-7z" /></svg>
                         {showTimer ? 'Cerrar Pomodoro' : 'Timer Pomodoro'}
                       </button>
@@ -376,7 +376,7 @@ const AreaView: React.FC<AreaViewProps> = ({ area, onUpdateArea, onDeleteArea })
                     >
                       {loadingQuiz ? '...' : 'Quiz'}
                     </button>
-                    <button onClick={handleSaveTopic} className={`px-6 py-2.5 rounded-xl font-bold transition-all ${hasUnsavedChanges ? 'bg-indigo-600 text-white shadow-lg scale-105' : 'bg-slate-100 dark:bg-slate-800 text-slate-400'}`}>Guardar Todo</button>
+                    <button onClick={handleSaveTopic} className={`px-6 py-2.5 rounded-xl font-bold transition-all ${hasUnsavedChanges ? 'bg-blue-600 text-white shadow-lg scale-105' : 'bg-slate-100 dark:bg-slate-800 text-slate-400'}`}>Guardar Todo</button>
                   </div>
                 </div>
 
@@ -394,7 +394,7 @@ const AreaView: React.FC<AreaViewProps> = ({ area, onUpdateArea, onDeleteArea })
                       <div className="flex items-center gap-2">
                         <div className="flex gap-1">
                           {[...Array(6)].map((_, i) => (
-                            <div key={i} className={`h-2 w-4 rounded-full ${i < (selectedTopic.reviewLevel || 0) ? 'bg-indigo-500' : 'bg-slate-200 dark:bg-slate-700'}`}></div>
+                            <div key={i} className={`h-2 w-4 rounded-full ${i < (selectedTopic.reviewLevel || 0) ? 'bg-blue-500' : 'bg-slate-200 dark:bg-slate-700'}`}></div>
                           ))}
                         </div>
                         <span className="text-xs font-bold text-slate-400">Nivel {selectedTopic.reviewLevel}</span>
@@ -420,13 +420,13 @@ const AreaView: React.FC<AreaViewProps> = ({ area, onUpdateArea, onDeleteArea })
                   <div>
                     <div className="flex items-center justify-between mb-3">
                       <label className="text-sm font-black text-slate-700 dark:text-slate-300 uppercase tracking-widest flex items-center gap-2">
-                        <svg className="w-4 h-4 text-indigo-500" fill="currentColor" viewBox="0 0 20 20"><path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clipRule="evenodd" /></svg>
+                        <svg className="w-4 h-4 text-blue-500" fill="currentColor" viewBox="0 0 20 20"><path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clipRule="evenodd" /></svg>
                         Bitácora Feynman
                       </label>
-                      <button onClick={() => handleAskAI(editTopicTitle)} disabled={loadingAI} className="text-[10px] font-black uppercase text-indigo-500 hover:underline">Consultar Tutor IA</button>
+                      <button onClick={() => handleAskAI(editTopicTitle)} disabled={loadingAI} className="text-[10px] font-black uppercase text-blue-500 hover:underline">Consultar Tutor IA</button>
                     </div>
                     <textarea
-                      className="w-full h-64 p-6 rounded-3xl bg-slate-50 dark:bg-slate-800 border-none focus:ring-2 focus:ring-indigo-500 dark:text-slate-200 text-lg leading-relaxed transition-all placeholder:text-slate-300"
+                      className="w-full h-64 p-6 rounded-3xl bg-slate-50 dark:bg-slate-800 border-none focus:ring-2 focus:ring-blue-500 dark:text-slate-200 text-lg leading-relaxed transition-all placeholder:text-slate-300"
                       placeholder="Explica el concepto como si se lo enseñaras a un niño..."
                       value={editTopicNotes}
                       onChange={(e) => { setEditTopicNotes(e.target.value); setHasUnsavedChanges(true); }}
@@ -437,15 +437,15 @@ const AreaView: React.FC<AreaViewProps> = ({ area, onUpdateArea, onDeleteArea })
                   <div>
                     <div className="flex items-center justify-between mb-4">
                       <label className="text-sm font-black text-slate-700 dark:text-slate-300 uppercase tracking-widest flex items-center gap-2">
-                        <svg className="w-4 h-4 text-indigo-600" fill="currentColor" viewBox="0 0 20 20"><path d="M7 3a1 1 0 000 2h6a1 1 0 100-2H7zM4 7a1 1 0 011-1h10a1 1 0 110 2H5a1 1 0 01-1-1zM2 11a2 2 0 012-2h12a2 2 0 012 2v4a2 2 0 01-2 2H4a2 2 0 01-2-2v-4z" /></svg>
+                        <svg className="w-4 h-4 text-blue-600" fill="currentColor" viewBox="0 0 20 20"><path d="M7 3a1 1 0 000 2h6a1 1 0 100-2H7zM4 7a1 1 0 011-1h10a1 1 0 110 2H5a1 1 0 01-1-1zM2 11a2 2 0 012-2h12a2 2 0 012 2v4a2 2 0 01-2 2H4a2 2 0 01-2-2v-4z" /></svg>
                         Biblioteca de Recursos
                       </label>
-                      <button onClick={() => addResource(selectedTopic.id)} className="text-xs bg-indigo-600 text-white px-4 py-2 rounded-full font-bold transition-all shadow-md hover:bg-indigo-700">Añadir Recurso</button>
+                      <button onClick={() => addResource(selectedTopic.id)} className="text-xs bg-blue-600 text-white px-4 py-2 rounded-full font-bold transition-all shadow-md hover:bg-blue-700">Añadir Recurso</button>
                     </div>
 
                     <div className="space-y-4">
                       {topicResources.length > 0 ? topicResources.map((res, index) => (
-                        <div key={res.id} className="bg-slate-50 dark:bg-slate-800/50 p-5 rounded-3xl border border-slate-100 dark:border-slate-800 transition-all hover:border-indigo-300 relative group">
+                        <div key={res.id} className="bg-slate-50 dark:bg-slate-800/50 p-5 rounded-3xl border border-slate-100 dark:border-slate-800 transition-all hover:border-blue-300 relative group">
                           <div className="flex flex-col md:flex-row gap-5">
                             {/* Reordering and Category Icon */}
                             <div className="flex flex-row md:flex-col items-center justify-center gap-2 border-r border-slate-200 dark:border-slate-700 pr-4">
@@ -479,10 +479,10 @@ const AreaView: React.FC<AreaViewProps> = ({ area, onUpdateArea, onDeleteArea })
                                   </button>
                                 )}
                                 <div className="flex-1 truncate">
-                                  <a href={res.url} target="_blank" rel="noreferrer" className={`font-bold text-slate-800 dark:text-slate-100 hover:text-indigo-600 block truncate ${res.watched ? 'line-through opacity-50' : ''}`}>
+                                  <a href={res.url} target="_blank" rel="noreferrer" className={`font-bold text-slate-800 dark:text-slate-100 hover:text-blue-600 block truncate ${res.watched ? 'line-through opacity-50' : ''}`}>
                                     {res.title}
                                   </a>
-                                  <span className="text-[10px] font-black uppercase text-indigo-500 tracking-widest">{res.type}</span>
+                                  <span className="text-[10px] font-black uppercase text-blue-500 tracking-widest">{res.type}</span>
                                 </div>
                               </div>
 
@@ -520,10 +520,10 @@ const AreaView: React.FC<AreaViewProps> = ({ area, onUpdateArea, onDeleteArea })
                 </div>
 
                 {aiResponse && (
-                  <div className="mt-10 p-8 bg-indigo-50 dark:bg-indigo-900/20 rounded-3xl border border-indigo-100 dark:border-indigo-900/50 relative animate-fade-in shadow-inner">
+                  <div className="mt-10 p-8 bg-blue-50 dark:bg-blue-900/20 rounded-3xl border border-blue-100 dark:border-blue-900/50 relative animate-fade-in shadow-inner">
                     <button onClick={() => setAiResponse(null)} className="absolute top-4 right-4 text-slate-400 hover:text-slate-600">✕</button>
-                    <h4 className="text-indigo-600 dark:text-indigo-300 font-black mb-4 flex items-center gap-2 uppercase text-xs tracking-widest">Tutoría IA</h4>
-                    <div className="text-slate-700 dark:text-slate-300 whitespace-pre-wrap text-base leading-relaxed prose prose-indigo dark:prose-invert">{aiResponse}</div>
+                    <h4 className="text-blue-600 dark:text-blue-300 font-black mb-4 flex items-center gap-2 uppercase text-xs tracking-widest">Tutoría IA</h4>
+                    <div className="text-slate-700 dark:text-slate-300 whitespace-pre-wrap text-base leading-relaxed prose prose-blue dark:prose-invert">{aiResponse}</div>
                   </div>
                 )}
               </div>
@@ -564,16 +564,16 @@ const AreaView: React.FC<AreaViewProps> = ({ area, onUpdateArea, onDeleteArea })
             <div className="space-y-4">
               <input
                 type="text" autoFocus placeholder="Título"
-                className="w-full px-5 py-4 rounded-2xl bg-slate-50 dark:bg-slate-800 border-none focus:ring-2 focus:ring-indigo-500 font-bold dark:text-white"
+                className="w-full px-5 py-4 rounded-2xl bg-slate-50 dark:bg-slate-800 border-none focus:ring-2 focus:ring-blue-500 font-bold dark:text-white"
                 value={newTopicData.title} onChange={e => setNewTopicData({ ...newTopicData, title: e.target.value })}
               />
               <textarea
-                placeholder="Resumen rápido..." className="w-full px-5 py-4 rounded-2xl bg-slate-50 dark:bg-slate-800 border-none focus:ring-2 focus:ring-indigo-500 h-24 dark:text-white"
+                placeholder="Resumen rápido..." className="w-full px-5 py-4 rounded-2xl bg-slate-50 dark:bg-slate-800 border-none focus:ring-2 focus:ring-blue-500 h-24 dark:text-white"
                 value={newTopicData.description} onChange={e => setNewTopicData({ ...newTopicData, description: e.target.value })}
               />
               <div className="flex gap-4 pt-4">
                 <button onClick={() => setIsAddingTopic(false)} className="flex-1 py-4 bg-slate-100 dark:bg-slate-800 rounded-2xl font-bold dark:text-slate-400">Cancelar</button>
-                <button onClick={handleAddManualTopic} className="flex-1 py-4 bg-indigo-600 text-white rounded-2xl font-bold">Guardar</button>
+                <button onClick={handleAddManualTopic} className="flex-1 py-4 bg-blue-600 text-white rounded-2xl font-bold">Guardar</button>
               </div>
             </div>
           </div>

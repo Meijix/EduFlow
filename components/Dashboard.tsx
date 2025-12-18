@@ -48,15 +48,15 @@ const Dashboard: React.FC<DashboardProps> = ({ areas, logs }) => {
         {/* Left Column: Key Stats and Heatmap */}
         <div className="lg:col-span-2 space-y-8">
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
-            <div className="bg-indigo-600 p-8 rounded-3xl text-white shadow-xl shadow-indigo-200 dark:shadow-none flex flex-col justify-between overflow-hidden relative group">
+            <div className="bg-blue-600 p-8 rounded-3xl text-white shadow-xl shadow-blue-200 dark:shadow-none flex flex-col justify-between overflow-hidden relative group">
               <div className="absolute -right-4 -bottom-4 opacity-10 group-hover:scale-110 transition-transform">
                 <svg className="w-32 h-32" fill="currentColor" viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-1 14.5v-9l6 4.5-6 4.5z"/></svg>
               </div>
               <div>
-                <p className="text-indigo-100 text-sm font-bold uppercase tracking-widest mb-1">Impacto Global</p>
+                <p className="text-blue-100 text-sm font-bold uppercase tracking-widest mb-1">Impacto Global</p>
                 <h3 className="text-4xl font-black">{overallProgress}%</h3>
               </div>
-              <p className="mt-4 text-xs font-medium text-indigo-100">Has dominado {completedTopics} de {totalTopics} temas propuestos.</p>
+              <p className="mt-4 text-xs font-medium text-blue-100">Has dominado {completedTopics} de {totalTopics} temas propuestos.</p>
             </div>
             
             <div className="bg-white dark:bg-slate-900 p-8 rounded-3xl border border-slate-100 dark:border-slate-800 shadow-sm flex flex-col justify-between">
@@ -152,7 +152,7 @@ const Dashboard: React.FC<DashboardProps> = ({ areas, logs }) => {
              <h4 className="text-sm font-black uppercase tracking-widest mb-6 text-slate-500">Logros Desbloqueados</h4>
              <div className="space-y-4">
                 <div className="flex items-center gap-4 group">
-                  <div className="w-10 h-10 bg-indigo-500/20 rounded-xl flex items-center justify-center text-xl group-hover:scale-110 transition-transform">🎓</div>
+                  <div className="w-10 h-10 bg-blue-500/20 rounded-xl flex items-center justify-center text-xl group-hover:scale-110 transition-transform">🎓</div>
                   <div>
                     <p className="text-xs font-black">Primeros pasos</p>
                     <p className="text-[10px] text-slate-500">Has creado tu primera área.</p>

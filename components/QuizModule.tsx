@@ -32,10 +32,10 @@ const QuizModule: React.FC<QuizModuleProps> = ({ questions, onComplete, onCancel
       <div className="bg-white dark:bg-slate-900 p-8 rounded-3xl text-center animate-scale-in border border-slate-100 dark:border-slate-800">
         <div className="text-5xl mb-4">🏆</div>
         <h3 className="text-2xl font-black mb-2">¡Cuestionario completado!</h3>
-        <p className="text-slate-500 mb-6">Tu puntuación: <span className="font-bold text-indigo-600">{score} de {questions.length}</span></p>
+        <p className="text-slate-500 mb-6">Tu puntuación: <span className="font-bold text-blue-600">{score} de {questions.length}</span></p>
         <button 
           onClick={() => onComplete(score)}
-          className="w-full py-4 bg-indigo-600 text-white rounded-2xl font-bold hover:bg-indigo-700 transition-all"
+          className="w-full py-4 bg-blue-600 text-white rounded-2xl font-bold hover:bg-blue-700 transition-all"
         >
           Finalizar y Guardar Progreso
         </button>
@@ -63,12 +63,12 @@ const QuizModule: React.FC<QuizModuleProps> = ({ questions, onComplete, onCancel
             onClick={() => setSelectedOption(idx)}
             className={`w-full p-4 rounded-2xl text-left font-medium transition-all border-2 ${
               selectedOption === idx 
-                ? 'border-indigo-500 bg-indigo-50 dark:bg-indigo-900/30 text-indigo-700 dark:text-indigo-300' 
+                ? 'border-blue-500 bg-blue-50 dark:bg-blue-900/30 text-blue-700 dark:text-blue-300' 
                 : 'border-slate-100 dark:border-slate-800 hover:border-slate-200 dark:hover:border-slate-700 text-slate-600 dark:text-slate-400'
             }`}
           >
             <div className="flex items-center gap-3">
-              <span className={`w-8 h-8 rounded-lg flex items-center justify-center text-xs font-bold ${selectedOption === idx ? 'bg-indigo-500 text-white' : 'bg-slate-100 dark:bg-slate-800'}`}>
+              <span className={`w-8 h-8 rounded-lg flex items-center justify-center text-xs font-bold ${selectedOption === idx ? 'bg-blue-500 text-white' : 'bg-slate-100 dark:bg-slate-800'}`}>
                 {String.fromCharCode(65 + idx)}
               </span>
               {option}
@@ -80,7 +80,7 @@ const QuizModule: React.FC<QuizModuleProps> = ({ questions, onComplete, onCancel
       <button
         disabled={selectedOption === null}
         onClick={handleNext}
-        className="w-full py-4 bg-slate-900 dark:bg-indigo-600 text-white rounded-2xl font-bold disabled:opacity-50 hover:bg-black dark:hover:bg-indigo-700 transition-all shadow-lg"
+        className="w-full py-4 bg-slate-900 dark:bg-blue-600 text-white rounded-2xl font-bold disabled:opacity-50 hover:bg-black dark:hover:bg-blue-700 transition-all shadow-lg"
       >
         {currentIndex === questions.length - 1 ? 'Ver resultados' : 'Siguiente pregunta'}
       </button>

@@ -26,13 +26,13 @@ const KanbanCard = ({ topic, onSelect }: { topic: Topic, onSelect: (id: string) 
       {...listeners}
       {...attributes}
       onClick={() => onSelect(topic.id)}
-      className="bg-white dark:bg-slate-900 p-4 rounded-2xl shadow-sm border border-slate-100 dark:border-slate-800 hover:shadow-md hover:border-indigo-300 transition-all cursor-grab group active:cursor-grabbing touch-none"
+      className="bg-white dark:bg-slate-900 p-4 rounded-2xl shadow-sm border border-slate-100 dark:border-slate-800 hover:shadow-md hover:border-blue-300 transition-all cursor-grab group active:cursor-grabbing touch-none"
     >
       <h5 className="font-bold text-slate-800 dark:text-slate-100 text-sm mb-1 truncate">{topic.title}</h5>
       <p className="text-[10px] text-slate-500 line-clamp-2 leading-relaxed">{topic.description}</p>
 
       <div className="flex justify-between items-center mt-3 pt-3 border-t border-slate-50 dark:border-slate-800/50">
-        <div className="text-[9px] font-black text-indigo-500/50 uppercase">
+        <div className="text-[9px] font-black text-blue-500/50 uppercase">
           {Math.floor(topic.timeSpent / 60)}m dedicado
         </div>
       </div>
@@ -81,7 +81,7 @@ const KanbanBoard: React.FC<KanbanBoardProps> = ({ topics, onMoveTopic, onSelect
   const columns = [
     { id: StudyStatus.PENDING, title: 'Por aprender', color: 'bg-slate-200 dark:bg-slate-800' },
     { id: StudyStatus.IN_PROGRESS, title: 'En proceso', color: 'bg-amber-100 dark:bg-amber-900/30' },
-    { id: StudyStatus.REVIEWING, title: 'Repasando', color: 'bg-indigo-100 dark:bg-indigo-900/30' },
+    { id: StudyStatus.REVIEWING, title: 'Repasando', color: 'bg-blue-100 dark:bg-blue-900/30' },
     { id: StudyStatus.COMPLETED, title: 'Dominado', color: 'bg-emerald-100 dark:bg-emerald-900/30' },
   ];
 

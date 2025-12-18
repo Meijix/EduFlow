@@ -28,7 +28,7 @@ const SortableAreaItem: React.FC<{ area: StudyArea, isActive: boolean, onClick: 
     <div ref={setNodeRef} style={style} {...attributes} {...listeners}>
       <button
         onClick={onClick}
-        className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl transition-all text-left ${isActive ? 'bg-indigo-50 dark:bg-indigo-900/40 text-indigo-700 dark:text-indigo-300 font-semibold ring-1 ring-indigo-200 dark:ring-indigo-800' : 'text-slate-600 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-800'}`}
+        className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl transition-all text-left ${isActive ? 'bg-blue-50 dark:bg-blue-900/40 text-blue-700 dark:text-blue-300 font-semibold ring-1 ring-blue-200 dark:ring-blue-800' : 'text-slate-600 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-800'}`}
       >
         <span className="text-xl bg-white dark:bg-slate-800 w-10 h-10 flex items-center justify-center rounded-lg shadow-sm">{area.icon || '📚'}</span>
         <span className="truncate flex-1">{area.name}</span>
@@ -60,7 +60,7 @@ const Sidebar: React.FC<SidebarProps> = ({ onAddArea }) => {
   return (
     <aside className="w-72 bg-white dark:bg-slate-900 border-r border-slate-200 dark:border-slate-800 h-screen sticky top-0 flex flex-col transition-colors duration-300">
       <div className="p-6 border-b border-slate-100 dark:border-slate-800 flex items-center justify-between">
-        <h1 className="text-xl font-bold text-indigo-600 dark:text-indigo-400 flex items-center gap-2 cursor-pointer" onClick={() => setActiveAreaId(null)}>
+        <h1 className="text-xl font-bold text-blue-600 dark:text-blue-400 flex items-center gap-2 cursor-pointer" onClick={() => setActiveAreaId(null)}>
           <svg className="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" />
           </svg>
@@ -68,7 +68,7 @@ const Sidebar: React.FC<SidebarProps> = ({ onAddArea }) => {
         </h1>
         <button
           onClick={toggleDarkMode}
-          className="p-2 rounded-lg bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 hover:ring-2 hover:ring-indigo-300 transition-all"
+          className="p-2 rounded-lg bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 hover:ring-2 hover:ring-blue-300 transition-all"
           title="Alternar Modo Oscuro"
         >
           {isDarkMode ? (
@@ -82,7 +82,7 @@ const Sidebar: React.FC<SidebarProps> = ({ onAddArea }) => {
       <nav className="flex-1 overflow-y-auto p-4 space-y-2 custom-scrollbar">
         <button
           onClick={() => setActiveAreaId(null)}
-          className={`w-full flex items-center gap-3 px-4 py-2 rounded-lg transition-colors ${!activeAreaId ? 'bg-indigo-50 dark:bg-indigo-900/30 text-indigo-700 dark:text-indigo-300' : 'text-slate-600 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-800'}`}
+          className={`w-full flex items-center gap-3 px-4 py-2 rounded-lg transition-colors ${!activeAreaId ? 'bg-blue-50 dark:bg-blue-900/30 text-blue-700 dark:text-blue-300' : 'text-slate-600 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-800'}`}
         >
           <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" />
@@ -118,7 +118,7 @@ const Sidebar: React.FC<SidebarProps> = ({ onAddArea }) => {
       <div className="p-4 border-t border-slate-100 dark:border-slate-800">
         <button
           onClick={onAddArea}
-          className="w-full bg-indigo-600 hover:bg-indigo-700 dark:bg-indigo-500 dark:hover:bg-indigo-600 text-white font-bold py-3 px-4 rounded-xl flex items-center justify-center gap-2 transition-transform active:scale-95 shadow-lg shadow-indigo-200 dark:shadow-none"
+          className="w-full bg-blue-600 hover:bg-blue-700 dark:bg-blue-500 dark:hover:bg-blue-600 text-white font-bold py-3 px-4 rounded-xl flex items-center justify-center gap-2 transition-transform active:scale-95 shadow-lg shadow-blue-200 dark:shadow-none"
         >
           <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 4v16m8-8H4" />
